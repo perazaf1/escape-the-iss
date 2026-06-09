@@ -11,7 +11,7 @@ header('Content-Type: application/json');
 
 if (!authCheck()) {
     http_response_code(401);
-    echo json_encode(['error' => 'Non autorise']);
+    echo json_encode(['error' => 'Non autorisé']);
     exit;
 }
 

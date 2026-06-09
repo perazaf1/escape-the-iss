@@ -39,7 +39,7 @@ if (authCheck()) {
 
             <h1 class="hero-title">
                 <span class="title-line title-line-1">ALERTE</span>
-                <span class="title-line title-line-2">GENERALE</span>
+                <span class="title-line title-line-2">G&Eacute;N&Eacute;RALE</span>
             </h1>
 
             <div class="hero-terminal" id="hero-terminal">
@@ -66,29 +66,29 @@ if (authCheck()) {
 
             <div class="briefing-content">
                 <div class="briefing-block reveal">
-                    <div class="block-timestamp">03:47 UTC — Detection de breche</div>
+                    <div class="block-timestamp">03:47 UTC &mdash; D&eacute;tection de br&egrave;che</div>
                     <p class="block-text">
-                        Cette nuit, une breche a ete detectee dans le module de stockage de l'ISS.
-                        Une bande d'aliens a infiltre la station et a derobe l'integralite du <strong class="text-highlight">stock de brioches</strong>.
+                        Cette nuit, une br&egrave;che a &eacute;t&eacute; d&eacute;tect&eacute;e dans le module de stockage de l'ISS.
+                        Une bande d'aliens a infiltr&eacute; la station et a d&eacute;rob&eacute; l'int&eacute;gralit&eacute; du <strong class="text-highlight">stock de brioches</strong>.
                     </p>
                 </div>
 
                 <div class="briefing-block reveal">
-                    <div class="block-timestamp">03:52 UTC — Analyse xenobiologique</div>
+                    <div class="block-timestamp">03:52 UTC &mdash; Analyse x&eacute;nobiologique</div>
                     <p class="block-text">
-                        D'apres nos analystes, ces creatures souffrent d'une forme rare de <strong class="text-highlight">dyslexie intergalactique</strong> :
+                        D'apr&egrave;s nos analystes, ces cr&eacute;atures souffrent d'une forme rare de <strong class="text-highlight">dyslexie intergalactique</strong> :
                         elles auraient confondu <span class="text-code">PASQUET</span> avec <span class="text-code">PASQUIER</span>.
-                        L'erreur n'a toujours pas ete remarquee de leur cote.
+                        L'erreur n'a toujours pas &eacute;t&eacute; remarqu&eacute;e de leur c&ocirc;t&eacute;.
                     </p>
                 </div>
 
                 <div class="briefing-block block-critical reveal">
                     <div class="block-timestamp">04:15 UTC — Alerte critique</div>
                     <p class="block-text">
-                        Un astronaute a bord consommait environ <strong class="text-critical">98%</strong> de ces brioches.
-                        Elles servaient de contrepoids naturel a la station.
+                        Un astronaute &agrave; bord consommait environ <strong class="text-critical">98%</strong> de ces brioches.
+                        Elles servaient de contrepoids naturel &agrave; la station.
                         Depuis leur disparition, <strong class="text-critical">l'ISS penche dangereusement sur tribord</strong>,
-                        les crayons flottent a l'envers et le cafe refuse categoriquement de rester dans les tasses.
+                        les crayons flottent &agrave; l'envers et le caf&eacute; refuse cat&eacute;goriquement de rester dans les tasses.
                     </p>
                 </div>
             </div>
@@ -105,8 +105,8 @@ if (authCheck()) {
             </div>
 
             <p class="mission-desc reveal">
-                Reorganiser la salle de stockage pour reequilibrer la station.
-                Placez les cargaisons aux distances exactes indiquees par l'ordinateur de bord.
+                R&eacute;organiser la salle de stockage pour r&eacute;&eacute;quilibrer la station.
+                Placez les cargaisons aux distances exactes indiqu&eacute;es par l'ordinateur de bord.
             </p>
 
             <div class="mission-steps">
@@ -118,9 +118,9 @@ if (authCheck()) {
                             <path d="M12 6v6l4 2"/>
                         </svg>
                     </div>
-                    <h3 class="step-name">Reservoir O2</h3>
-                    <p class="step-desc">L'oxygene de secours doit etre repositionne a la distance exacte.</p>
-                    <div class="step-status">DISTANCE : CLASSIFIEE</div>
+                    <h3 class="step-name">R&eacute;servoir O2</h3>
+                    <p class="step-desc">L'oxyg&egrave;ne de secours doit &ecirc;tre repositionn&eacute; &agrave; la distance exacte.</p>
+                    <div class="step-status">DISTANCE : CLASSIFI&Eacute;E</div>
                 </div>
 
                 <div class="step-card reveal">
@@ -132,8 +132,8 @@ if (authCheck()) {
                         </svg>
                     </div>
                     <h3 class="step-name">Caisse de rations</h3>
-                    <p class="step-desc">La nourriture de l'equipage doit etre a portee de main.</p>
-                    <div class="step-status">DISTANCE : CLASSIFIEE</div>
+                    <p class="step-desc">La nourriture de l'&eacute;quipage doit &ecirc;tre &agrave; port&eacute;e de main.</p>
+                    <div class="step-status">DISTANCE : CLASSIFI&Eacute;E</div>
                 </div>
 
                 <div class="step-card reveal">
@@ -144,8 +144,8 @@ if (authCheck()) {
                         </svg>
                     </div>
                     <h3 class="step-name">Module de communication</h3>
-                    <p class="step-desc">Les transmissions necessitent de l'espace pour eviter les interferences.</p>
-                    <div class="step-status">DISTANCE : CLASSIFIEE</div>
+                    <p class="step-desc">Les transmissions n&eacute;cessitent de l'espace pour &eacute;viter les interf&eacute;rences.</p>
+                    <div class="step-status">DISTANCE : CLASSIFI&Eacute;E</div>
                 </div>
             </div>
 
@@ -155,7 +155,7 @@ if (authCheck()) {
                     <line x1="12" y1="9" x2="12" y2="13"/>
                     <line x1="12" y1="17" x2="12.01" y2="17"/>
                 </svg>
-                <span>Une erreur de quelques centimetres pourrait envoyer l'ISS dans une vrille spatiale incontr&ocirc;lable.</span>
+                <span>Une erreur de quelques centim&egrave;tres pourrait envoyer l'ISS dans une vrille spatiale incontr&ocirc;lable.</span>
             </div>
         </div>
     </section>
@@ -164,7 +164,7 @@ if (authCheck()) {
     <section class="cta-section" id="cta">
         <div class="cta-container reveal">
             <div class="cta-border-top"></div>
-            <p class="cta-text">Ce message ne s'autodetruira pas &mdash; le budget ne le permet pas.</p>
+            <p class="cta-text">Ce message ne s'autod&eacute;truira pas &mdash; le budget ne le permet pas.</p>
             <h2 class="cta-title">BONNE CHANCE, ASTRONAUTES.</h2>
             <div class="cta-buttons">
                 <a href="/php/auth/login.php" class="cta-btn cta-btn-primary">
@@ -172,7 +172,7 @@ if (authCheck()) {
                     COMMENCER LA MISSION
                 </a>
                 <a href="/php/auth/register.php" class="cta-btn cta-btn-secondary">
-                    CREER UN COMPTE
+                    CR&Eacute;ER UN COMPTE
                 </a>
             </div>
             <div class="cta-border-bottom"></div>

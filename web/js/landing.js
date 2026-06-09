@@ -54,10 +54,10 @@
     const terminal = document.getElementById('hero-terminal');
     if (terminal) {
         const lines = [
-            '> Breche detectee dans le module de stockage...',
+            '> Brèche détectée dans le module de stockage...',
             '> Stock de brioches : DISPARU.',
-            '> Equilibre station : CRITIQUE.',
-            '> Mission : Reorganiser la salle de stockage.'
+            '> Équilibre station : CRITIQUE.',
+            '> Mission : Réorganiser la salle de stockage.'
         ];
 
         let lineIdx = 0;
