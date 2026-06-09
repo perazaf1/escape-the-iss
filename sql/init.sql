@@ -32,8 +32,12 @@ CREATE TABLE IF NOT EXISTS g5e_enigme_steps (
     label VARCHAR(100) NOT NULL COMMENT 'Nom de l objet ou de l étape (ex: Caisse Oxygène)',
     target_distance_cm SMALLINT UNSIGNED NOT NULL COMMENT 'Distance cible en cm',
     tolerance_cm TINYINT UNSIGNED NOT NULL DEFAULT 3 COMMENT 'Marge d erreur acceptée en cm',
-    hint_text VARCHAR(255) DEFAULT NULL COMMENT 'Indice affiché aux joueurs'
+    hint_text VARCHAR(255) DEFAULT NULL COMMENT 'Indice affiché aux joueurs',
+    unlocked TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Enigme résolue côté web (0=verrouillé, 1=déverrouillé)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Migration : ajouter la colonne unlocked si la table existe déjà
+-- ALTER TABLE g5e_enigme_steps ADD COLUMN IF NOT EXISTS unlocked TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Enigme résolue côté web (0=verrouillé, 1=déverrouillé)';
 
 -- Données initiales des étapes (ajustables)
 -- Ordre non croissant volontaire : 35 → 20 → 50 cm

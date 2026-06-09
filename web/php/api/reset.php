@@ -27,6 +27,7 @@ try {
     $pdo->exec("DELETE FROM g5e_alerts");
     $pdo->exec("DELETE FROM g5e_capteur_logs");
     $pdo->exec("DELETE FROM g5e_game_sessions");
+    $pdo->exec("UPDATE g5e_enigme_steps SET unlocked = 0");
     $pdo->exec("UPDATE progression SET progress = 0 WHERE salle = 'G5E'");
 
     echo json_encode(['success' => true, 'message' => 'Donnees G5E remises a zero']);

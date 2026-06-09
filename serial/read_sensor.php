@@ -50,7 +50,8 @@ $steps = $pdo->query('SELECT * FROM g5e_enigme_steps ORDER BY step_order ASC')->
 echo "[OK] " . count($steps) . " etapes chargees.\n";
 
 foreach ($steps as $s) {
-    echo "     Etape {$s['step_order']}: {$s['label']} → {$s['target_distance_cm']} cm (± {$s['tolerance_cm']} cm)\n";
+    $lockIcon = !empty($s['unlocked']) ? 'DEVERROUILLE' : 'VERROUILLE';
+    echo "     Etape {$s['step_order']}: {$s['label']} → {$s['target_distance_cm']} cm (± {$s['tolerance_cm']} cm) [{$lockIcon}]\n";
 }
 
 // --- Trouver ou creer une session active ---
@@ -88,11 +89,16 @@ foreach ($alertRows->fetchAll() as $row) {
 
 echo "[OK] Etapes deja validees : " . (empty($validatedSteps) ? 'aucune' : implode(', ', $validatedSteps)) . "\n";
 
-// --- Trouver l'etape courante ---
+// --- Trouver l'etape courante (doit etre non-validee ET deverrouillee) ---
 function getCurrentStep($steps, $validatedSteps) {
     foreach ($steps as $step) {
         if (!in_array((int)$step['step_order'], $validatedSteps, true)) {
-            return $step;
+            // L'etape n'est pas encore validee
+            if (!empty($step['unlocked'])) {
+                return $step; // Deverrouillee → on peut la valider
+            } else {
+                return null; // Prochaine etape pas encore deverrouillee → attendre
+            }
         }
     }
     return null; // Toutes validees
@@ -187,10 +193,21 @@ while (true) {
                 }
                 $distVal = smoothDistance($distanceBuffer, $SMOOTHING_WINDOW);
 
-                // --- Resync : verifier que la session existe toujours ---
+                // --- Resync : recharger etapes (unlocked) + verifier session ---
                 if ($now - $lastResyncCheck >= $RESYNC_INTERVAL) {
                     $lastResyncCheck = $now;
                     try {
+                        // Toujours recharger les etapes (pour detecter les unlock depuis le web)
+                        $oldCurrentStep = $currentStep ? (int)$currentStep['step_order'] : null;
+                        $steps = $pdo->query('SELECT * FROM g5e_enigme_steps ORDER BY step_order ASC')->fetchAll();
+                        $currentStep = getCurrentStep($steps, $validatedSteps);
+                        $newCurrentStep = $currentStep ? (int)$currentStep['step_order'] : null;
+
+                        if ($oldCurrentStep !== $newCurrentStep && $newCurrentStep !== null) {
+                            echo "\n[UNLOCK] Etape {$newCurrentStep} deverrouillee ! Validation activee.\n";
+                        }
+
+                        // Verifier que la session existe toujours
                         $checkSession = $pdo->prepare(
                             "SELECT id, status FROM g5e_game_sessions WHERE id = :sid"
                         );
@@ -199,9 +216,6 @@ while (true) {
                         if (!$sessionRow) {
                             // Session supprimee (reset web) — resynchroniser
                             echo "\n[RESYNC] Session #$sessionId supprimee. Resynchronisation...\n";
-
-                            // Recharger les etapes
-                            $steps = $pdo->query('SELECT * FROM g5e_enigme_steps ORDER BY step_order ASC')->fetchAll();
 
                             // Trouver ou creer une nouvelle session
                             $newSession = $pdo->query(
@@ -227,7 +241,7 @@ while (true) {
                             $outOfZoneCount = 0;
 
                             echo "[RESYNC] Nouvelle session #$sessionId. Etape courante : " .
-                                ($currentStep ? $currentStep['step_order'] : 'aucune') . "\n";
+                                ($currentStep ? $currentStep['step_order'] : 'aucune (verrouille)') . "\n";
                         }
                     } catch (PDOException $e) {
                         // Ignorer les erreurs de resync

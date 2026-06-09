@@ -198,6 +198,14 @@
                 feedback.textContent = 'ACCES AUTORISE';
                 feedback.className = 'enigme-feedback success';
             }
+
+            // Persister le deverrouillage en BDD (pour que read_sensor.php le sache)
+            fetch('/php/api/unlock_step.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ step_order: stepOrder })
+            }).catch(() => {});
+
             // Rebuild after short delay for visual feedback
             setTimeout(() => {
                 stepsData = null; // force rebuild
@@ -512,6 +520,7 @@
     // --- Fetch live sensor ---
     let liveDistance = null;
     let prevStepOrder = null;
+    let liveInitialized = false; // eviter les toasts au chargement de la page
 
     function fetchSensorLive() {
         fetch(API_LIVE)
@@ -540,28 +549,35 @@
                     holdStop();
                 }
 
-                // Detect step validation (step changed = previous step was validated)
-                if (prevStepOrder !== null && currentStep !== null && currentStep !== prevStepOrder) {
-                    // Step advanced — previous step was validated
-                    if (stepsData) {
-                        const validated = stepsData.find(s => s.step_order === prevStepOrder);
-                        if (validated) {
-                            showValidationToast(prevStepOrder, validated.label);
+                // Premier poll — initialiser sans toast
+                if (!liveInitialized) {
+                    liveInitialized = true;
+                    prevStepOrder = currentStep;
+                } else if (prevStepOrder !== currentStep) {
+                    // Step a change — verifier si c'est une vraie validation
+                    if (prevStepOrder !== null && currentStep !== null && currentStep !== prevStepOrder) {
+                        // Step avance — l'etape precedente a ete validee
+                        if (stepsData) {
+                            const validated = stepsData.find(s => s.step_order === prevStepOrder);
+                            if (validated && isUnlocked(prevStepOrder)) {
+                                showValidationToast(prevStepOrder, validated.label);
+                            }
                         }
+                        holdStop();
+                        fetchDashboard();
+                    } else if (prevStepOrder !== null && currentStep === null) {
+                        // Toutes les etapes terminees
+                        if (stepsData) {
+                            const last = stepsData.find(s => s.step_order === prevStepOrder);
+                            if (last && isUnlocked(prevStepOrder)) {
+                                showValidationToast(prevStepOrder, last.label);
+                            }
+                        }
+                        holdStop();
+                        fetchDashboard();
                     }
-                    holdStop();
-                    // Refresh steps immediately (don't wait 5s poll)
-                    fetchDashboard();
-                } else if (prevStepOrder !== null && currentStep === null && prevStepOrder !== null) {
-                    // All steps done
-                    if (stepsData) {
-                        const last = stepsData.find(s => s.step_order === prevStepOrder);
-                        if (last) showValidationToast(prevStepOrder, last.label);
-                    }
-                    holdStop();
-                    fetchDashboard();
+                    prevStepOrder = currentStep;
                 }
-                prevStepOrder = currentStep;
 
                 if (stepsData) {
                     updateStepsState(stepsData, dist);
