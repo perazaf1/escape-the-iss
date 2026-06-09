@@ -16,6 +16,55 @@
     let historyChart = null;
     let currentPeriod = '5min';
 
+    // --- ENIGMES (riddles) ---
+    // Answers are simple hashes to avoid plain-text in source
+    // hash = sum of charCodes * 7 + length
+    function hashAnswer(val) {
+        const s = String(val).trim();
+        let h = 0;
+        for (let i = 0; i < s.length; i++) h += s.charCodeAt(i);
+        return h * 7 + s.length;
+    }
+
+    const ENIGMES = {
+        1: {
+            title: 'ENIGME // RESERVOIR O2',
+            text: 'L\'equipage consomme <span class="enigme-highlight">7 litres d\'O2 par heure</span>. La reserve de secours doit tenir <span class="enigme-highlight">5 heures</span>.<br>Combien de litres dans le reservoir ?',
+            hash: hashAnswer('35'),
+            hint: 'Entrez un nombre'
+        },
+        2: {
+            title: 'ENIGME // CAISSE DE RATIONS',
+            text: 'L\'ordinateur de bord affiche ce code :<br><span class="enigme-code">10100</span><br>Les astronautes pensent en <span class="enigme-highlight">binaire</span>. Convertissez.',
+            hash: hashAnswer('20'),
+            hint: 'Nombre decimal'
+        },
+        3: {
+            title: 'ENIGME // MODULE COMM',
+            text: 'Un message chiffre a ete intercepte :<br><span class="enigme-code">FLQTXDQWH</span><br>Le chiffrement de <span class="enigme-highlight">Cesar</span> avec un decalage de <span class="enigme-highlight">3</span> a ete utilise. Dechiffrez et ecrivez le nombre correspondant.',
+            hash: hashAnswer('50'),
+            hint: 'Nombre en chiffres'
+        }
+    };
+
+    // Unlock state from localStorage
+    function getUnlocked() {
+        try {
+            return JSON.parse(localStorage.getItem('g5e_unlocked') || '{}');
+        } catch (e) { return {}; }
+    }
+    function setUnlocked(stepOrder) {
+        const u = getUnlocked();
+        u[stepOrder] = true;
+        localStorage.setItem('g5e_unlocked', JSON.stringify(u));
+    }
+    function isUnlocked(stepOrder) {
+        return !!getUnlocked()[stepOrder];
+    }
+    function resetUnlocked() {
+        localStorage.removeItem('g5e_unlocked');
+    }
+
     // --- Build ruler ticks ---
     function buildRuler() {
         const track = document.querySelector('.ruler-track');
@@ -55,33 +104,114 @@
             const left = ((center - tol - DIST_MIN) / (DIST_MAX - DIST_MIN)) * 100;
             const right = ((center + tol - DIST_MIN) / (DIST_MAX - DIST_MIN)) * 100;
             const width = right - left;
+            const unlocked = isUnlocked(step.step_order);
 
-            // Zone element
+            // Zone element — only visible if unlocked
             const zone = document.createElement('div');
             zone.className = 'target-zone pending';
             zone.dataset.step = step.step_order;
-            zone.style.left = Math.max(0, left) + '%';
-            zone.style.width = Math.min(width, 100 - left) + '%';
-
-            zone.innerHTML = `
-                <div class="target-zone-label">ETAPE ${step.step_order}</div>
-                <div class="target-zone-check"></div>
-                <div class="target-zone-dist">${center} cm</div>
-            `;
+            if (unlocked) {
+                zone.style.left = Math.max(0, left) + '%';
+                zone.style.width = Math.min(width, 100 - left) + '%';
+                zone.innerHTML = `
+                    <div class="target-zone-label">ETAPE ${step.step_order}</div>
+                    <div class="target-zone-check"></div>
+                    <div class="target-zone-dist">${center} cm</div>
+                `;
+            } else {
+                zone.classList.add('locked');
+                zone.style.display = 'none';
+            }
             container.appendChild(zone);
 
             // Card element
             const card = document.createElement('div');
-            card.className = 'step-card pending';
             card.dataset.step = step.step_order;
-            card.innerHTML = `
-                <div class="step-card-order">ETAPE ${step.step_order}</div>
-                <div class="step-card-label">${escapeHtml(step.label)}</div>
-                <div class="step-card-target">Cible : ${center} cm (&plusmn; ${tol} cm)</div>
-                <div class="step-card-status">EN ATTENTE</div>
-            `;
+            const enigme = ENIGMES[step.step_order];
+
+            if (unlocked) {
+                card.className = 'step-card pending';
+                card.innerHTML = `
+                    <div class="step-card-order">ETAPE ${step.step_order}</div>
+                    <div class="step-card-label">${escapeHtml(step.label)}</div>
+                    <div class="step-card-target">Cible : ${center} cm (&plusmn; ${tol} cm)</div>
+                    <div class="step-card-status">EN ATTENTE</div>
+                `;
+            } else if (enigme) {
+                card.className = 'step-card locked enigme-card';
+                card.innerHTML = `
+                    <div class="step-card-order">ETAPE ${step.step_order}</div>
+                    <div class="enigme-lock-icon">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <rect x="3" y="7" width="10" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/>
+                            <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                        </svg>
+                        VERROUILLE
+                    </div>
+                    <div class="enigme-title">${enigme.title}</div>
+                    <div class="enigme-text">${enigme.text}</div>
+                    <div class="enigme-input-row">
+                        <input type="text" class="enigme-input" data-step="${step.step_order}" placeholder="${enigme.hint}" autocomplete="off" spellcheck="false" />
+                        <button class="enigme-submit" data-step="${step.step_order}">VALIDER</button>
+                    </div>
+                    <div class="enigme-feedback" id="enigme-feedback-${step.step_order}"></div>
+                `;
+            }
             cardsContainer.appendChild(card);
         });
+
+        // Bind enigme events
+        bindEnigmeEvents(steps);
+    }
+
+    // --- Enigme validation ---
+    function bindEnigmeEvents(steps) {
+        document.querySelectorAll('.enigme-submit').forEach(btn => {
+            btn.addEventListener('click', function () {
+                tryEnigme(parseInt(this.dataset.step), steps);
+            });
+        });
+        document.querySelectorAll('.enigme-input').forEach(input => {
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    tryEnigme(parseInt(this.dataset.step), steps);
+                }
+            });
+        });
+    }
+
+    function tryEnigme(stepOrder, steps) {
+        const input = document.querySelector(`.enigme-input[data-step="${stepOrder}"]`);
+        const feedback = document.getElementById('enigme-feedback-' + stepOrder);
+        if (!input) return;
+
+        const val = input.value.trim();
+        if (!val) return;
+
+        const enigme = ENIGMES[stepOrder];
+        if (!enigme) return;
+
+        if (hashAnswer(val) === enigme.hash) {
+            // Correct!
+            setUnlocked(stepOrder);
+            if (feedback) {
+                feedback.textContent = 'ACCES AUTORISE';
+                feedback.className = 'enigme-feedback success';
+            }
+            // Rebuild after short delay for visual feedback
+            setTimeout(() => {
+                stepsData = null; // force rebuild
+                fetchDashboard();
+            }, 600);
+        } else {
+            // Wrong
+            if (feedback) {
+                feedback.textContent = 'REPONSE INCORRECTE';
+                feedback.className = 'enigme-feedback error';
+            }
+            input.classList.add('shake');
+            setTimeout(() => input.classList.remove('shake'), 400);
+        }
     }
 
     // --- Update steps validation state ---
@@ -96,8 +226,11 @@
             const card = document.querySelector(`.step-card[data-step="${step.step_order}"]`);
             if (!zone || !card) return;
 
+            // Skip locked (enigme not solved) cards
+            if (!isUnlocked(step.step_order)) return;
+
             zone.classList.remove('pending', 'active', 'validated');
-            card.classList.remove('pending', 'active', 'validated');
+            card.classList.remove('pending', 'active', 'validated', 'locked');
 
             const statusEl = card.querySelector('.step-card-status');
 
@@ -463,11 +596,12 @@
         const btn = document.getElementById('btn-reset');
         if (!btn) return;
         btn.addEventListener('click', () => {
-            if (!confirm('Remettre toutes les donnees a zero ?')) return;
+            if (!confirm('Remettre toutes les donnees a zero (enigmes + capteur) ?')) return;
             fetch('/php/api/reset.php', { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        resetUnlocked();
                         stepsData = null;
                         fetchDashboard();
                         fetchHistory();
