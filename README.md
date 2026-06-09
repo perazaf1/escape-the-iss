@@ -110,8 +110,8 @@ Le script lit le port série (COM3 par défaut), insère les mesures en BDD, et 
 - **Dashboard temps réel** : progression des 5 salles, jauge SVG animée, sparkline, chrono session
 - **Cargo Bay** : visualisation schématique des zones cibles, sensor line live, barre de hold, toast de validation
 - **Historique Chart.js** : courbes d'évolution capteur, filtrable par période (5min à 24h)
-- **Validation automatique** : le script série détecte les étapes, met à jour la progression, génère des alertes
-- **Reset** : remise à zéro complète (alertes, logs, sessions, progression)
+- **Validation automatique** : le script série détecte les étapes avec **lissage du capteur** (moyenne glissante) et **tolérance au bruit** (2 lectures hors zone tolérées), met à jour la progression, génère des alertes. Resync automatique après un reset web.
+- **Reset** : remise à zéro complète (alertes, logs, sessions, progression) — le script série se resynchronise automatiquement
 
 ## Équipe
 

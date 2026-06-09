@@ -54,10 +54,16 @@ void setup() {
 }
 
 void loop() {
-  int adcVal = analogRead(CAPTEUR_PIN);
+  // Moyenne sur 10 lectures pour lisser le bruit du capteur
+  long adcSum = 0;
+  for (int i = 0; i < 10; i++) {
+    adcSum += analogRead(CAPTEUR_PIN);
+    delayMicroseconds(500);
+  }
+  int adcVal = (int)(adcSum / 10);
 
   float distance = adcToDistance(adcVal);
-  int distInt = (int)distance;
+  int distInt = (int)(distance + 0.5); // arrondi au lieu de troncature
 
   ledsOff();
 

@@ -141,6 +141,22 @@ $lastDbInsert = 0;
 // Validation : temps dans la zone
 $inZoneSince = null;  // timestamp quand on entre dans la zone
 $wasInZone = false;
+$outOfZoneCount = 0;  // compteur de lectures hors zone consecutives
+$MAX_OUT_OF_ZONE = 2; // tolerer jusqu'a 2 lectures hors zone (bruit capteur)
+
+// Lissage : moyenne glissante sur N lectures
+$SMOOTHING_WINDOW = 5;
+$distanceBuffer = [];
+
+// Resync : verifier si la session existe toujours (apres un reset web)
+$lastResyncCheck = microtime(true);
+$RESYNC_INTERVAL = 5.0; // verifier toutes les 5 secondes
+
+function smoothDistance($distanceBuffer, $windowSize) {
+    if (empty($distanceBuffer)) return 0;
+    $slice = array_slice($distanceBuffer, -$windowSize);
+    return (int)round(array_sum($slice) / count($slice));
+}
 
 while (true) {
     $data = dio_read($serialPort, 256);
@@ -161,18 +177,72 @@ while (true) {
 
             if (preg_match('/^ADC:(\d+);DIST:(\d+)$/', $line, $matches)) {
                 $adcVal = (int)$matches[1];
-                $distVal = (int)$matches[2];
+                $distRaw = (int)$matches[2];
                 $now = microtime(true);
+
+                // --- Lissage par moyenne glissante ---
+                $distanceBuffer[] = $distRaw;
+                if (count($distanceBuffer) > $SMOOTHING_WINDOW * 2) {
+                    $distanceBuffer = array_slice($distanceBuffer, -$SMOOTHING_WINDOW);
+                }
+                $distVal = smoothDistance($distanceBuffer, $SMOOTHING_WINDOW);
+
+                // --- Resync : verifier que la session existe toujours ---
+                if ($now - $lastResyncCheck >= $RESYNC_INTERVAL) {
+                    $lastResyncCheck = $now;
+                    try {
+                        $checkSession = $pdo->prepare(
+                            "SELECT id FROM g5e_game_sessions WHERE id = :sid AND status = 'en_cours'"
+                        );
+                        $checkSession->execute([':sid' => $sessionId]);
+                        if (!$checkSession->fetch()) {
+                            // Session supprimee (reset) — resynchroniser
+                            echo "\n[RESYNC] Session #$sessionId supprimee. Resynchronisation...\n";
+
+                            // Recharger les etapes
+                            $steps = $pdo->query('SELECT * FROM g5e_enigme_steps ORDER BY step_order ASC')->fetchAll();
+
+                            // Trouver ou creer une nouvelle session
+                            $newSession = $pdo->query(
+                                "SELECT id FROM g5e_game_sessions WHERE status = 'en_cours' ORDER BY id DESC LIMIT 1"
+                            )->fetch();
+
+                            if (!$newSession) {
+                                $firstUser = $pdo->query('SELECT id FROM g5e_users ORDER BY id ASC LIMIT 1')->fetch();
+                                $startedBy = $firstUser ? $firstUser['id'] : 1;
+                                $pdo->prepare(
+                                    "INSERT INTO g5e_game_sessions (started_by, status) VALUES (:uid, 'en_cours')"
+                                )->execute([':uid' => $startedBy]);
+                                $sessionId = (int)$pdo->lastInsertId();
+                            } else {
+                                $sessionId = (int)$newSession['id'];
+                            }
+
+                            // Reset etat validation
+                            $validatedSteps = [];
+                            $currentStep = getCurrentStep($steps, $validatedSteps);
+                            $wasInZone = false;
+                            $inZoneSince = null;
+                            $outOfZoneCount = 0;
+
+                            echo "[RESYNC] Nouvelle session #$sessionId. Etape courante : " .
+                                ($currentStep ? $currentStep['step_order'] : 'aucune') . "\n";
+                        }
+                    } catch (PDOException $e) {
+                        // Ignorer les erreurs de resync
+                    }
+                }
 
                 // --- Fichier live ---
                 $liveData = [
-                    'adc_value'   => $adcVal,
-                    'distance_cm' => $distVal,
-                    'timestamp'   => date('Y-m-d H:i:s'),
-                    'session_id'  => $sessionId,
+                    'adc_value'    => $adcVal,
+                    'distance_cm'  => $distVal,
+                    'distance_raw' => $distRaw,
+                    'timestamp'    => date('Y-m-d H:i:s'),
+                    'session_id'   => $sessionId,
                     'current_step' => $currentStep ? (int)$currentStep['step_order'] : null,
-                    'in_zone'     => false,
-                    'hold_time'   => 0
+                    'in_zone'      => false,
+                    'hold_time'    => 0
                 ];
 
                 // --- Logique de validation ---
@@ -183,11 +253,13 @@ while (true) {
                     $isInZone = $diff <= $tolerance;
 
                     if ($isInZone) {
+                        $outOfZoneCount = 0; // reset le compteur de sorties
+
                         if (!$wasInZone) {
                             // Vient d'entrer dans la zone
                             $inZoneSince = $now;
                             $wasInZone = true;
-                            echo "[ZONE] Objet detecte dans la zone de l'etape {$currentStep['step_order']} ({$distVal} cm, cible {$target} cm)\n";
+                            echo "[ZONE] Objet detecte dans la zone de l'etape {$currentStep['step_order']} ({$distVal} cm lisse, cible {$target} cm)\n";
                         }
 
                         $holdTime = $now - $inZoneSince;
@@ -205,7 +277,7 @@ while (true) {
                             $stepOrder = (int)$currentStep['step_order'];
                             $validatedSteps[] = $stepOrder;
 
-                            echo "\n[VALIDE] Etape {$stepOrder} validee ! ({$currentStep['label']})\n";
+                            echo "\n[VALIDE] ★ Etape {$stepOrder} validee ! ({$currentStep['label']})\n";
 
                             // Inserer alerte de validation
                             $stmtAlert->execute([
@@ -224,6 +296,7 @@ while (true) {
                             $currentStep = getCurrentStep($steps, $validatedSteps);
                             $wasInZone = false;
                             $inZoneSince = null;
+                            $outOfZoneCount = 0;
 
                             // Mettre a jour liveData immediatement pour le client
                             $liveData['current_step'] = $currentStep ? (int)$currentStep['step_order'] : null;
@@ -253,12 +326,24 @@ while (true) {
                             }
                         }
                     } else {
-                        // Sorti de la zone
+                        // Lecture hors zone
                         if ($wasInZone) {
-                            echo "\n[ZONE] Objet sorti de la zone.\n";
+                            $outOfZoneCount++;
+
+                            if ($outOfZoneCount > $MAX_OUT_OF_ZONE) {
+                                // Vraiment sorti de la zone (pas juste du bruit)
+                                echo "\n[ZONE] Objet sorti de la zone ({$distVal} cm, {$outOfZoneCount} lectures hors zone).\n";
+                                $wasInZone = false;
+                                $inZoneSince = null;
+                                $outOfZoneCount = 0;
+                            } else {
+                                // Tolerer le bruit — garder le timer actif
+                                $holdTime = $now - $inZoneSince;
+                                $liveData['in_zone'] = true;
+                                $liveData['hold_time'] = round($holdTime, 1);
+                                echo "\r[BRUIT] Lecture hors zone ignoree ($outOfZoneCount/$MAX_OUT_OF_ZONE, {$distVal} cm)   ";
+                            }
                         }
-                        $wasInZone = false;
-                        $inZoneSince = null;
                     }
                 }
 
@@ -287,3 +372,4 @@ while (true) {
 }
 
 dio_close($serialPort);
+
