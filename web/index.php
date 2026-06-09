@@ -3,7 +3,7 @@ require_once __DIR__ . '/php/includes/auth.php';
 authStart();
 
 if (!authCheck()) {
-    header('Location: /php/auth/login.php');
+    header('Location: /php/pages/landing.php');
     exit;
 }
 

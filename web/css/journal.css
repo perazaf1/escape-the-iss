@@ -1,0 +1,446 @@
+/* ============================================================
+   JOURNAL DE BORD — ISS G5E System Event Log
+   Terminal console style — mission control aesthetics
+   ============================================================ */
+
+.journal-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* --- HEADER --- */
+.journal-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.08);
+}
+
+.journal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.journal-icon {
+    color: var(--cyan);
+    opacity: 0.8;
+}
+
+.journal-title {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--white-cold);
+    margin: 0;
+}
+
+.journal-subtitle {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: var(--white-dim);
+    margin-top: 4px;
+    opacity: 0.6;
+}
+
+.journal-header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.journal-counter-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.counter-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    color: var(--white-dim);
+    opacity: 0.5;
+}
+
+.counter-value {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 2px;
+}
+
+.journal-live-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    background: rgba(0, 255, 136, 0.05);
+}
+
+.live-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--green-sys);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--green-sys);
+    animation: breathe 2s ease-in-out infinite;
+}
+
+.live-label {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: var(--green-sys);
+    font-weight: 600;
+}
+
+/* --- FILTERS --- */
+.journal-filters {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    color: var(--white-dim);
+    background: rgba(14, 21, 37, 0.6);
+    border: 1px solid rgba(0, 212, 255, 0.08);
+    cursor: pointer;
+    transition: all .2s;
+    text-transform: uppercase;
+}
+
+.filter-btn:hover {
+    background: rgba(0, 212, 255, 0.06);
+    border-color: rgba(0, 212, 255, 0.2);
+    color: var(--white-cold);
+}
+
+.filter-btn.active {
+    background: rgba(0, 212, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.35);
+    color: var(--cyan);
+}
+
+.filter-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.dot-all { background: var(--white-dim); }
+.dot-info { background: var(--cyan); box-shadow: 0 0 4px rgba(0, 212, 255, 0.5); }
+.dot-warning { background: var(--orange-alert); box-shadow: 0 0 4px rgba(255, 107, 43, 0.5); }
+.dot-critical { background: var(--red-critical); box-shadow: 0 0 4px rgba(255, 45, 85, 0.5); }
+
+.filter-count {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    opacity: 0.5;
+}
+
+.filter-spacer { flex: 1; }
+
+.scroll-toggle {
+    margin-left: auto;
+}
+
+.scroll-toggle.active {
+    color: var(--green-sys);
+    border-color: rgba(0, 255, 136, 0.3);
+    background: rgba(0, 255, 136, 0.06);
+}
+
+/* --- TERMINAL --- */
+.journal-terminal {
+    position: relative;
+    background: linear-gradient(180deg, rgba(10, 15, 26, 0.95) 0%, rgba(5, 8, 15, 0.98) 100%);
+    border: 1px solid rgba(0, 212, 255, 0.1);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+}
+
+/* Corner brackets decoration */
+.journal-terminal::before,
+.journal-terminal::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: rgba(0, 212, 255, 0.25);
+    border-style: solid;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.journal-terminal::before {
+    top: -1px;
+    left: -1px;
+    border-width: 2px 0 0 2px;
+}
+
+.journal-terminal::after {
+    bottom: -1px;
+    right: -1px;
+    border-width: 0 2px 2px 0;
+}
+
+.terminal-chrome {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: rgba(14, 21, 37, 0.8);
+    border-bottom: 1px solid rgba(0, 212, 255, 0.08);
+}
+
+.terminal-dots {
+    display: flex;
+    gap: 5px;
+}
+
+.t-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.t-red { background: #ff5f57; }
+.t-yellow { background: #ffbd2e; }
+.t-green { background: #28c840; }
+
+.terminal-path {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--white-dim);
+    opacity: 0.5;
+    letter-spacing: 0.5px;
+}
+
+.terminal-status {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    color: var(--green-sys);
+    animation: breathe 2s ease-in-out infinite;
+}
+
+.terminal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--blue-glacial) transparent;
+}
+
+/* Loading state */
+.terminal-loading {
+    padding: 12px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.loading-line {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--white-dim);
+    opacity: 0.5;
+    animation: fadeInUp .4s ease-out both;
+}
+
+.loading-line:nth-child(2) { animation-delay: .3s; }
+
+.loading-cursor {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--cyan);
+    animation: terminalBlink 1s step-end infinite;
+}
+
+/* --- LOG ENTRIES --- */
+.log-entry {
+    display: grid;
+    grid-template-columns: 150px 80px auto;
+    gap: 12px;
+    padding: 7px 20px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.5;
+    border-left: 2px solid transparent;
+    transition: background .15s, border-color .15s;
+}
+
+.log-entry:hover {
+    background: rgba(0, 212, 255, 0.03);
+}
+
+.log-entry.new-entry {
+    animation: logSlideIn .35s ease-out both;
+}
+
+/* Severity colors */
+.log-entry.severity-info {
+    border-left-color: rgba(0, 212, 255, 0.3);
+}
+
+.log-entry.severity-warning {
+    border-left-color: rgba(255, 107, 43, 0.5);
+}
+
+.log-entry.severity-critical {
+    border-left-color: rgba(255, 45, 85, 0.5);
+    background: rgba(255, 45, 85, 0.03);
+}
+
+.log-timestamp {
+    color: var(--white-dim);
+    opacity: 0.5;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+}
+
+.log-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1px 8px;
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: 1px solid;
+    height: fit-content;
+}
+
+.tag-info {
+    color: var(--cyan);
+    border-color: rgba(0, 212, 255, 0.25);
+    background: rgba(0, 212, 255, 0.06);
+}
+
+.tag-warning {
+    color: var(--orange-alert);
+    border-color: rgba(255, 107, 43, 0.25);
+    background: rgba(255, 107, 43, 0.06);
+}
+
+.tag-critical {
+    color: var(--red-critical);
+    border-color: rgba(255, 45, 85, 0.25);
+    background: rgba(255, 45, 85, 0.06);
+}
+
+.log-message {
+    color: var(--white-cold);
+    word-break: break-word;
+}
+
+.log-type {
+    color: var(--white-dim);
+    opacity: 0.4;
+    margin-left: 8px;
+    font-size: 0.6rem;
+}
+
+/* Empty state */
+.terminal-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 12px;
+}
+
+.terminal-empty svg {
+    color: var(--white-dim);
+    opacity: 0.2;
+}
+
+.terminal-empty-text {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--white-dim);
+    opacity: 0.4;
+    letter-spacing: 1px;
+}
+
+/* --- ANIMATIONS --- */
+@keyframes logSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-12px);
+        background: rgba(0, 212, 255, 0.08);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+        background: transparent;
+    }
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .journal-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .journal-header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .journal-title {
+        font-size: 1rem;
+        letter-spacing: 3px;
+    }
+
+    .log-entry {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        padding: 10px 14px;
+    }
+
+    .log-tag {
+        width: fit-content;
+    }
+
+    .journal-filters {
+        gap: 4px;
+    }
+
+    .filter-btn {
+        padding: 5px 10px;
+        font-size: 0.62rem;
+    }
+
+    .journal-terminal {
+        min-height: 400px;
+    }
+}
