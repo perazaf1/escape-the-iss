@@ -41,6 +41,10 @@ $currentPage = basename($_SERVER['SCRIPT_NAME'], '.php');
                 <span class="nav-link-indicator"></span>
                 CARGO
             </a>
+            <a href="/php/pages/iss-tracker.php" class="nav-link <?= $currentPage === 'iss-tracker' ? 'active' : '' ?>">
+                <span class="nav-link-indicator"></span>
+                ISS TRACKER
+            </a>
             <a href="#" class="nav-link <?= $currentPage === 'logs' ? 'active' : '' ?>">
                 <span class="nav-link-indicator"></span>
                 JOURNAL

@@ -21,15 +21,14 @@ Projet de fin d'année ISEP A1 — Escape Game Connecté sur le thème de la Sta
 
 Le joueur place des objets devant un **capteur de proximité infrarouge** (Sharp GP2Y0A21YK0F) relié à une carte **TI TIVA TM4C123G**. Le capteur mesure la distance en temps réel.
 
-4 étapes séquentielles :
+3 étapes séquentielles (ordre non croissant volontaire) :
 | Étape | Objet | Distance cible | Tolérance |
 |-------|-------|----------------|-----------|
-| 1 | Caisse de rations | 20 cm | +/- 4 cm |
-| 2 | Réservoir O2 auxiliaire | 35 cm | +/- 4 cm |
+| 1 | Réservoir O2 auxiliaire | 35 cm | +/- 4 cm |
+| 2 | Caisse de rations | 20 cm | +/- 4 cm |
 | 3 | Module de communication | 50 cm | +/- 4 cm |
-| 4 | Conteneur de brioches vide | 65 cm | +/- 4 cm |
 
-Chaque objet doit rester dans la zone de tolérance pendant **3 secondes** pour valider l'étape. Les 4 étapes validées = énigme réussie, progression 100%.
+Chaque objet doit rester dans la zone de tolérance pendant **3 secondes** pour valider l'étape. Les 3 étapes validées = énigme réussie, progression 100%.
 
 ## Stack technique
 

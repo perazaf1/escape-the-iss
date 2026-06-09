@@ -36,11 +36,11 @@ CREATE TABLE IF NOT EXISTS g5e_enigme_steps (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Données initiales des étapes (ajustables)
+-- Ordre non croissant volontaire : 35 → 20 → 50 cm
 INSERT INTO g5e_enigme_steps (step_order, label, target_distance_cm, tolerance_cm, hint_text) VALUES
-(1, 'Caisse de rations', 20, 4, 'La nourriture doit être à portée de main...'),
-(2, 'Réservoir O2 auxiliaire', 35, 4, 'L oxygène de secours, ni trop près ni trop loin.'),
-(3, 'Module de communication', 50, 4, 'Les transmissions nécessitent de l espace.'),
-(4, 'Conteneur de brioches vide', 65, 4, 'Le conteneur vide... souvenir douloureux.');
+(1, 'Réservoir O2 auxiliaire', 35, 4, 'L oxygène de secours, ni trop près ni trop loin.'),
+(2, 'Caisse de rations', 20, 4, 'La nourriture doit être à portée de main...'),
+(3, 'Module de communication', 50, 4, 'Les transmissions nécessitent de l espace.');
 
 -- 4. LOGS DU CAPTEUR (historique des mesures)
 CREATE TABLE IF NOT EXISTS g5e_capteur_logs (

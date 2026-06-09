@@ -4,7 +4,7 @@
  * Lecture du port serie + insertion BDD + validation automatique des etapes
  *
  * Mecanique de jeu :
- *   - 4 objets a placer a des distances cibles (20, 35, 50, 65 cm)
+ *   - 3 objets a placer a des distances cibles (35, 20, 50 cm)
  *   - Le joueur place un objet devant le capteur
  *   - Si la distance est dans la zone de tolerance pendant 3 secondes → etape validee
  *   - Les etapes se valident dans l'ordre (1 puis 2 puis 3 puis 4)

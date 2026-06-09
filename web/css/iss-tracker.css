@@ -1,0 +1,543 @@
+/* ============================================================
+   ISS G5E — Orbital Tracking System
+   Mission Control Real-Time ISS Position
+   ============================================================ */
+
+/* --- HEADER --- */
+.tracker-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 20px;
+}
+
+.tracker-section-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: var(--white-dim);
+    margin-bottom: 6px;
+}
+
+.tracker-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--white-cold);
+    text-transform: uppercase;
+}
+
+.tracker-header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Signal indicator */
+.tracker-signal {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.signal-icon {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 14px;
+}
+
+.signal-bar {
+    width: 3px;
+    background: var(--white-dim);
+    opacity: 0.2;
+    transition: all 0.3s;
+}
+
+.signal-bar.bar-1 { height: 4px; }
+.signal-bar.bar-2 { height: 7px; }
+.signal-bar.bar-3 { height: 10px; }
+.signal-bar.bar-4 { height: 14px; }
+
+.signal-icon.active .signal-bar {
+    background: var(--green-sys);
+    opacity: 1;
+    box-shadow: 0 0 4px rgba(0, 255, 136, 0.4);
+}
+
+.signal-label {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    color: var(--white-dim);
+    transition: color 0.3s;
+}
+
+.signal-label.active {
+    color: var(--green-sys);
+}
+
+/* UTC clock */
+.tracker-utc {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    border: 1px solid rgba(0, 212, 255, 0.12);
+    background: rgba(0, 212, 255, 0.03);
+}
+
+.utc-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    color: var(--white-dim);
+    opacity: 0.5;
+}
+
+.utc-time {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--cyan);
+    letter-spacing: 2px;
+}
+
+/* --- TELEMETRY STRIP --- */
+.telemetry-strip {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: 16px;
+    background: rgba(10, 15, 26, 0.8);
+    border: 1px solid rgba(0, 212, 255, 0.08);
+    border-top: 2px solid rgba(0, 212, 255, 0.2);
+    overflow: hidden;
+}
+
+.telem-cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 12px;
+    position: relative;
+    min-width: 0;
+}
+
+.telem-cell::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 2px;
+    background: var(--cyan);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.telem-cell.has-data::before {
+    opacity: 0.5;
+}
+
+.telem-divider {
+    width: 1px;
+    align-self: stretch;
+    background: linear-gradient(
+        180deg,
+        transparent 10%,
+        rgba(0, 212, 255, 0.15) 50%,
+        transparent 90%
+    );
+}
+
+.telem-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    color: var(--white-dim);
+    opacity: 0.45;
+    margin-bottom: 4px;
+}
+
+.telem-value {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--white-cold);
+    line-height: 1.1;
+    transition: color 0.3s, text-shadow 0.3s;
+}
+
+.telem-value.has-data {
+    text-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
+}
+
+.telem-unit {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 1.5px;
+    color: var(--cyan);
+    opacity: 0.5;
+    margin-top: 2px;
+}
+
+/* Visibility special states */
+.telem-visibility.vis-daylight {
+    color: var(--orange-alert);
+}
+
+.telem-visibility.vis-eclipsed {
+    color: var(--blue-mid);
+}
+
+/* --- MAP FRAME --- */
+.tracker-map-wrapper {
+    margin-bottom: 16px;
+}
+
+.map-frame {
+    position: relative;
+    border: 1px solid rgba(0, 212, 255, 0.12);
+    background: var(--black-panel);
+    overflow: hidden;
+}
+
+/* Technical corner brackets */
+.map-corner {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    z-index: 800;
+    pointer-events: none;
+}
+
+.corner-tl {
+    top: 0; left: 0;
+    border-top: 2px solid var(--cyan);
+    border-left: 2px solid var(--cyan);
+}
+
+.corner-tr {
+    top: 0; right: 0;
+    border-top: 2px solid var(--cyan);
+    border-right: 2px solid var(--cyan);
+}
+
+.corner-bl {
+    bottom: 0; left: 0;
+    border-bottom: 2px solid var(--cyan);
+    border-left: 2px solid var(--cyan);
+}
+
+.corner-br {
+    bottom: 0; right: 0;
+    border-bottom: 2px solid var(--cyan);
+    border-right: 2px solid var(--cyan);
+}
+
+#iss-map {
+    width: 100%;
+    height: 480px;
+    background: var(--black-abyss);
+    z-index: 1;
+}
+
+/* Remove default Leaflet chrome for cleaner look */
+.leaflet-control-attribution {
+    background: rgba(10, 15, 26, 0.85) !important;
+    color: var(--white-dim) !important;
+    font-family: var(--font-mono) !important;
+    font-size: 0.5rem !important;
+    letter-spacing: 0.5px;
+    border: none !important;
+    padding: 2px 6px !important;
+}
+
+.leaflet-control-attribution a {
+    color: var(--cyan) !important;
+    opacity: 0.6;
+}
+
+.leaflet-control-zoom {
+    border: none !important;
+}
+
+.leaflet-control-zoom a {
+    background: rgba(10, 15, 26, 0.9) !important;
+    color: var(--cyan) !important;
+    border: 1px solid rgba(0, 212, 255, 0.15) !important;
+    font-family: var(--font-mono) !important;
+    width: 28px !important;
+    height: 28px !important;
+    line-height: 28px !important;
+    font-size: 14px !important;
+}
+
+.leaflet-control-zoom a:hover {
+    background: rgba(0, 212, 255, 0.1) !important;
+    color: #fff !important;
+}
+
+/* Crosshair overlay (subtle, center of map) */
+.map-crosshair {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    z-index: 700;
+    pointer-events: none;
+    opacity: 0.12;
+}
+
+.crosshair-h, .crosshair-v {
+    position: absolute;
+    background: var(--cyan);
+}
+
+.crosshair-h {
+    width: 100%;
+    height: 1px;
+    top: 50%; left: 0;
+}
+
+.crosshair-v {
+    width: 1px;
+    height: 100%;
+    top: 0; left: 50%;
+}
+
+/* Map HUD overlays */
+.map-hud-topleft,
+.map-hud-topright,
+.map-hud-bottomleft,
+.map-hud-bottomright {
+    position: absolute;
+    z-index: 800;
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 1.5px;
+    color: var(--white-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+    padding: 8px 12px;
+}
+
+.map-hud-topleft     { top: 0; left: 0; }
+.map-hud-topright    { top: 0; right: 0; }
+.map-hud-bottomleft  { bottom: 0; left: 0; }
+.map-hud-bottomright { bottom: 0; right: 0; }
+
+.hud-tag {
+    padding: 2px 6px;
+    background: rgba(255, 45, 85, 0.15);
+    color: var(--red-critical);
+    border: 1px solid rgba(255, 45, 85, 0.3);
+    font-size: 0.5rem;
+    letter-spacing: 2px;
+    font-weight: 600;
+}
+
+.hud-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--red-critical);
+    box-shadow: 0 0 6px var(--red-critical);
+    animation: breathe 1.5s ease-in-out infinite;
+}
+
+.hud-label {
+    opacity: 0.4;
+}
+
+.hud-val {
+    color: var(--cyan);
+    opacity: 0.7;
+}
+
+/* --- ISS MARKER (Leaflet custom) --- */
+.iss-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iss-marker-ping {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid var(--cyan);
+    opacity: 0;
+    animation: markerPing 3s ease-out infinite;
+}
+
+.iss-marker-ping:nth-child(2) {
+    animation-delay: 1s;
+}
+
+.iss-marker-ping:nth-child(3) {
+    animation-delay: 2s;
+}
+
+@keyframes markerPing {
+    0%   { transform: scale(0.5); opacity: 0.7; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+
+.iss-marker-core {
+    position: relative;
+    z-index: 10;
+    width: 32px;
+    height: 32px;
+}
+
+.iss-marker-core svg {
+    filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.5));
+}
+
+/* Footprint circle */
+.iss-footprint {
+    stroke: var(--cyan);
+    fill: rgba(0, 212, 255, 0.04);
+    stroke-dasharray: 6, 4;
+    opacity: 0.4;
+}
+
+/* Ground track line */
+.iss-ground-track {
+    stroke: var(--cyan);
+    stroke-width: 1.5;
+    stroke-dasharray: 8, 6;
+    fill: none;
+    opacity: 0.35;
+}
+
+/* --- ORBIT DATA ROW --- */
+.orbit-data-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.orbit-panel {
+    padding: 18px 22px;
+}
+
+.orbit-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.06);
+}
+
+.orbit-panel-title {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--white-cold);
+}
+
+.orbit-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.orbit-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.orbit-stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 1.5px;
+    color: var(--white-dim);
+    opacity: 0.45;
+}
+
+.orbit-stat-value {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--white-cold);
+    letter-spacing: 0.5px;
+}
+
+.api-status {
+    color: var(--orange-alert) !important;
+    transition: color 0.3s;
+}
+
+.api-status.ok {
+    color: var(--green-sys) !important;
+}
+
+.api-status.error {
+    color: var(--red-critical) !important;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
+    .tracker-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .telemetry-strip {
+        flex-wrap: wrap;
+    }
+
+    .telem-cell {
+        flex: 1 1 calc(33% - 1px);
+    }
+
+    .telem-divider:nth-child(6) {
+        display: none;
+    }
+
+    .orbit-data-row {
+        grid-template-columns: 1fr;
+    }
+
+    #iss-map {
+        height: 360px;
+    }
+}
+
+@media (max-width: 600px) {
+    .telem-cell {
+        flex: 1 1 calc(50% - 1px);
+    }
+
+    .telem-value {
+        font-size: 1.1rem;
+    }
+
+    #iss-map {
+        height: 280px;
+    }
+
+    .tracker-header-right {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
