@@ -550,6 +550,8 @@
                         }
                     }
                     holdStop();
+                    // Refresh steps immediately (don't wait 5s poll)
+                    fetchDashboard();
                 } else if (prevStepOrder !== null && currentStep === null && prevStepOrder !== null) {
                     // All steps done
                     if (stepsData) {
@@ -557,6 +559,7 @@
                         if (last) showValidationToast(prevStepOrder, last.label);
                     }
                     holdStop();
+                    fetchDashboard();
                 }
                 prevStepOrder = currentStep;
 

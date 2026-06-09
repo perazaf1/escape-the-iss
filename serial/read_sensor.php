@@ -225,6 +225,11 @@ while (true) {
                             $wasInZone = false;
                             $inZoneSince = null;
 
+                            // Mettre a jour liveData immediatement pour le client
+                            $liveData['current_step'] = $currentStep ? (int)$currentStep['step_order'] : null;
+                            $liveData['in_zone'] = false;
+                            $liveData['hold_time'] = 0;
+
                             if ($currentStep) {
                                 echo "[JEU] Prochaine etape : {$currentStep['step_order']} — {$currentStep['label']} ({$currentStep['target_distance_cm']} cm)\n";
                             } else {
