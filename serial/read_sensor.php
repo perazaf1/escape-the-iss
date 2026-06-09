@@ -192,11 +192,12 @@ while (true) {
                     $lastResyncCheck = $now;
                     try {
                         $checkSession = $pdo->prepare(
-                            "SELECT id FROM g5e_game_sessions WHERE id = :sid AND status = 'en_cours'"
+                            "SELECT id, status FROM g5e_game_sessions WHERE id = :sid"
                         );
                         $checkSession->execute([':sid' => $sessionId]);
-                        if (!$checkSession->fetch()) {
-                            // Session supprimee (reset) — resynchroniser
+                        $sessionRow = $checkSession->fetch();
+                        if (!$sessionRow) {
+                            // Session supprimee (reset web) — resynchroniser
                             echo "\n[RESYNC] Session #$sessionId supprimee. Resynchronisation...\n";
 
                             // Recharger les etapes
