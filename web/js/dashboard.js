@@ -16,6 +16,33 @@
     const DIST_MAX = 80;
 
     let lastData = null;
+    let knownAlertIds = new Set();
+    let firstAlertLoad = true;
+
+    // --- Toast container ---
+    const toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    document.body.appendChild(toastContainer);
+
+    function showToast(alert) {
+        const el = document.createElement('div');
+        el.className = `toast severity-${alert.severity || 'info'}`;
+        el.innerHTML =
+            '<div class="toast-icon"></div>' +
+            '<div class="toast-body">' +
+            '<div class="toast-tag">' + (alert.severity || 'info').toUpperCase() + '</div>' +
+            '<div class="toast-msg">' + escapeHtml(alert.message) + '</div>' +
+            '</div>';
+        el.addEventListener('click', () => {
+            el.classList.add('toast-out');
+            setTimeout(() => el.remove(), 300);
+        });
+        toastContainer.appendChild(el);
+        setTimeout(() => {
+            el.classList.add('toast-out');
+            setTimeout(() => el.remove(), 300);
+        }, 6000);
+    }
 
     // --- Init gauge ticks ---
     function initGaugeTicks() {
@@ -280,8 +307,21 @@
         if (!terminal || !alerts) return;
 
         if (alerts.length === 0) {
-            terminal.innerHTML = '<div class="alert-line dim">&gt; Aucune alerte systeme enregistree</div>';
+            terminal.innerHTML = '<div class="alert-line dim">&gt; Aucun événement enregistré</div>';
             return;
+        }
+
+        // Detect new alerts → show toasts
+        if (firstAlertLoad) {
+            alerts.forEach(a => knownAlertIds.add(String(a.id)));
+            firstAlertLoad = false;
+        } else {
+            alerts.forEach(a => {
+                if (!knownAlertIds.has(String(a.id))) {
+                    knownAlertIds.add(String(a.id));
+                    showToast(a);
+                }
+            });
         }
 
         const html = alerts.map(a => {
