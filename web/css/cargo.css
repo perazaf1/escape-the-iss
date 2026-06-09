@@ -1,0 +1,655 @@
+/* ============================================================
+   ISS G5E — Cargo Bay Visualization + Chart
+   ============================================================ */
+
+/* --- HEADER --- */
+.cargo-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.cargo-header-right {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+.cargo-section-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    color: var(--white-dim);
+    margin-bottom: 6px;
+}
+
+.tag-marker {
+    width: 12px;
+    height: 2px;
+    background: var(--cyan);
+}
+
+.cargo-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--white-cold);
+    text-transform: uppercase;
+}
+
+/* --- RESET BUTTON --- */
+.btn-reset {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    background: rgba(255, 45, 85, 0.08);
+    border: 1px solid rgba(255, 45, 85, 0.25);
+    color: var(--red-critical);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-reset:hover {
+    background: rgba(255, 45, 85, 0.15);
+    border-color: var(--red-critical);
+    box-shadow: 0 0 10px rgba(255, 45, 85, 0.2);
+}
+
+/* --- BALANCE METER --- */
+.balance-meter {
+    text-align: right;
+}
+
+.balance-label {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    color: var(--white-dim);
+    margin-bottom: 6px;
+}
+
+.balance-bar-track {
+    width: 200px;
+    height: 6px;
+    background: rgba(0, 212, 255, 0.08);
+    margin-left: auto;
+    margin-bottom: 4px;
+    overflow: hidden;
+}
+
+.balance-bar-fill {
+    height: 100%;
+    background: var(--cyan);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+    transition: width 0.5s ease-out;
+}
+
+.balance-bar-fill.complete {
+    background: var(--green-sys);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+}
+
+.balance-pct {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--cyan);
+}
+
+/* --- SCHEMATIC CONTAINER --- */
+.schematic-container {
+    position: relative;
+    height: 280px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+/* Blueprint grid */
+.blueprint-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+}
+
+.blueprint-grid::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(0, 212, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.06) 1px, transparent 1px);
+    background-size: 100px 100px;
+    pointer-events: none;
+}
+
+/* --- RULER --- */
+.ruler {
+    position: absolute;
+    top: 30px;
+    left: 80px;
+    right: 30px;
+    height: 40px;
+}
+
+.ruler-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.ruler-tick {
+    position: absolute;
+    bottom: 0;
+    width: 1px;
+    background: rgba(0, 212, 255, 0.25);
+}
+
+.ruler-tick.major {
+    height: 16px;
+    background: rgba(0, 212, 255, 0.4);
+}
+
+.ruler-tick.minor {
+    height: 8px;
+}
+
+.ruler-tick-label {
+    position: absolute;
+    bottom: 20px;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--white-dim);
+    opacity: 0.6;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* --- TARGET ZONES --- */
+.target-zones {
+    position: absolute;
+    top: 80px;
+    left: 80px;
+    right: 30px;
+    height: 140px;
+}
+
+.target-zone {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-left: 1px dashed;
+    border-right: 1px dashed;
+    transition: all 0.3s;
+}
+
+.target-zone.pending {
+    background: rgba(0, 212, 255, 0.03);
+    border-color: rgba(0, 212, 255, 0.15);
+}
+
+.target-zone.active {
+    background: rgba(0, 212, 255, 0.06);
+    border-color: rgba(0, 212, 255, 0.3);
+    animation: zonePulse 2s ease-in-out infinite;
+}
+
+.target-zone.validated {
+    background: rgba(0, 255, 136, 0.04);
+    border-color: rgba(0, 255, 136, 0.2);
+}
+
+@keyframes zonePulse {
+    0%, 100% { background: rgba(0, 212, 255, 0.04); }
+    50% { background: rgba(0, 212, 255, 0.08); }
+}
+
+.target-zone-label {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 1px;
+    padding: 1px 4px;
+    white-space: nowrap;
+}
+
+.target-zone.pending .target-zone-label {
+    color: var(--white-dim);
+    opacity: 0.5;
+}
+
+.target-zone.active .target-zone-label {
+    color: var(--cyan);
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.target-zone.validated .target-zone-label {
+    color: var(--green-sys);
+    background: rgba(0, 255, 136, 0.1);
+}
+
+.target-zone-dist {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.target-zone.pending .target-zone-dist { color: var(--white-dim); opacity: 0.4; }
+.target-zone.active .target-zone-dist { color: var(--cyan); }
+.target-zone.validated .target-zone-dist { color: var(--green-sys); }
+
+/* Validated checkmark */
+.target-zone-check {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--green-sys);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.target-zone.validated .target-zone-check {
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+}
+
+.target-zone-check::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--green-sys);
+    box-shadow: 0 0 6px var(--green-sys);
+}
+
+/* --- SENSOR LINE (live indicator) --- */
+.sensor-line {
+    position: absolute;
+    top: 70px;
+    height: 160px;
+    width: 2px;
+    left: 80px;
+    z-index: 10;
+    transition: left 0.18s ease-out;
+    pointer-events: none;
+}
+
+.sensor-line-beam {
+    position: absolute;
+    top: 0;
+    left: -8px;
+    width: 18px;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(0, 212, 255, 0.08) 30%,
+        rgba(0, 212, 255, 0.15) 50%,
+        rgba(0, 212, 255, 0.08) 70%,
+        transparent 100%
+    );
+}
+
+.sensor-line-head {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.6), 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.sensor-line-label {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+    white-space: nowrap;
+}
+
+.sensor-line-label::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid var(--cyan);
+}
+
+/* --- SENSOR ORIGIN --- */
+.sensor-origin {
+    position: absolute;
+    top: 80px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--cyan);
+    opacity: 0.7;
+}
+
+.sensor-origin-icon {
+    animation: breathe 3s ease-in-out infinite;
+}
+
+.sensor-origin-label {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 1.5px;
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    color: var(--white-dim);
+    opacity: 0.5;
+}
+
+/* --- HOLD PROGRESS BAR --- */
+.hold-bar-wrapper {
+    margin: 12px 0 16px;
+    padding: 10px 14px;
+    background: rgba(0, 212, 255, 0.03);
+    border: 1px solid rgba(0, 212, 255, 0.08);
+    transition: opacity 0.25s, background 0.3s, border-color 0.3s;
+    opacity: 0;
+    height: 0;
+    padding: 0 14px;
+    margin: 0;
+    overflow: hidden;
+}
+
+.hold-bar-wrapper.visible {
+    opacity: 1;
+    height: auto;
+    padding: 10px 14px;
+    margin: 12px 0 16px;
+}
+
+.hold-bar-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.hold-bar-title {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    color: var(--cyan);
+}
+
+.hold-bar-time {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--cyan);
+}
+
+.hold-bar-track {
+    height: 4px;
+    background: rgba(0, 212, 255, 0.1);
+    overflow: hidden;
+}
+
+.hold-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
+    transition: width 0.15s linear;
+}
+
+.hold-bar-fill.complete {
+    background: var(--green-sys);
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+}
+
+.hold-bar-wrapper.in-zone {
+    border-color: rgba(0, 212, 255, 0.25);
+    background: rgba(0, 212, 255, 0.05);
+}
+
+/* --- STEPS CARDS (below schematic) --- */
+.steps-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+.step-card {
+    padding: 12px;
+    background: rgba(5, 8, 15, 0.6);
+    border-top: 2px solid rgba(0, 212, 255, 0.08);
+    transition: all 0.3s;
+}
+
+.step-card.active {
+    border-top-color: var(--cyan);
+    background: rgba(0, 212, 255, 0.03);
+}
+
+.step-card.validated {
+    border-top-color: var(--green-sys);
+    background: rgba(0, 255, 136, 0.03);
+}
+
+.step-card-order {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 1.5px;
+    color: var(--white-dim);
+    opacity: 0.5;
+    margin-bottom: 4px;
+}
+
+.step-card.active .step-card-order { color: var(--cyan); opacity: 1; }
+.step-card.validated .step-card-order { color: var(--green-sys); opacity: 1; }
+
+.step-card-label {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--white-cold);
+    margin-bottom: 2px;
+}
+
+.step-card-target {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--white-dim);
+    opacity: 0.5;
+}
+
+.step-card-status {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    margin-top: 8px;
+}
+
+.step-card.pending .step-card-status { color: var(--white-dim); opacity: 0.4; }
+.step-card.active .step-card-status { color: var(--cyan); }
+.step-card.validated .step-card-status { color: var(--green-sys); }
+
+/* --- VALIDATION TOAST --- */
+.validation-toast {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: rgba(5, 8, 15, 0.95);
+    border: 1px solid var(--green-sys);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2), 0 4px 24px rgba(0, 0, 0, 0.5);
+    transform: translateX(120%);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
+}
+
+.validation-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast-icon {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--green-sys);
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.toast-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: var(--green-sys);
+    box-shadow: 0 0 6px var(--green-sys);
+}
+
+.toast-title {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--green-sys);
+}
+
+.toast-label {
+    font-family: var(--font-ui);
+    font-size: 0.7rem;
+    color: var(--white-dim);
+    margin-top: 2px;
+}
+
+/* --- CHART SECTION --- */
+.cargo-chart-wrapper {
+    margin-top: 16px;
+}
+
+.chart-period-btns {
+    display: flex;
+    gap: 2px;
+    margin-left: auto;
+}
+
+.period-btn {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    background: transparent;
+    border: 1px solid rgba(0, 212, 255, 0.1);
+    color: var(--white-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.period-btn:hover {
+    background: rgba(0, 212, 255, 0.06);
+    border-color: rgba(0, 212, 255, 0.2);
+    color: var(--cyan);
+}
+
+.period-btn.active {
+    background: rgba(0, 212, 255, 0.1);
+    border-color: var(--cyan);
+    color: var(--cyan);
+}
+
+.chart-container {
+    position: relative;
+    height: 220px;
+    margin: 12px 0;
+}
+
+#history-chart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.chart-footer {
+    display: flex;
+    gap: 24px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0, 212, 255, 0.06);
+}
+
+.chart-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chart-stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 1.5px;
+    color: var(--white-dim);
+    opacity: 0.5;
+}
+
+.chart-stat-value {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--white-cold);
+    letter-spacing: 1px;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .cargo-header { flex-direction: column; align-items: flex-start; }
+    .balance-meter { text-align: left; }
+    .balance-bar-track { margin-left: 0; }
+    .steps-cards { grid-template-columns: repeat(2, 1fr); }
+    .schematic-container { height: 220px; }
+}

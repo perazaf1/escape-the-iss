@@ -1,0 +1,30 @@
+# === Fichiers sensibles ===
+.env
+web/php/includes/db.config.php
+
+# === Données locales capteur ===
+serial/latest.json
+
+# === PlatformIO build ===
+tiva/.pio/
+tiva/.vscode/
+
+# === Docs / datasheets (trop lourds pour git) ===
+*.pdf
+*.docx
+
+# === OS ===
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# === IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# === Claude Code ===
+.claude/
+CLAUDE.md
