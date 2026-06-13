@@ -13,7 +13,7 @@ require_once __DIR__ . '/../includes/header.php';
 <section class="cargo-header animate-in">
     <div class="cargo-header-left">
         <div class="cargo-section-tag">
-            <span class="tag-marker"></span>
+            <span class="tag-marker" aria-hidden="true"></span>
             MODULE G5E — CARGO BAY SCHEMATIC
         </div>
         <h1 class="cargo-title">Equilibrage Station</h1>
@@ -34,14 +34,14 @@ require_once __DIR__ . '/../includes/header.php';
 <section class="cargo-schematic-wrapper animate-in" style="animation-delay: 0.1s">
     <div class="iss-panel">
         <div class="panel-header">
-            <div class="panel-header-marker"></div>
+            <div class="panel-header-marker" aria-hidden="true"></div>
             <h2 class="panel-title">Schema Cargo</h2>
             <span class="panel-subtitle">CROSS-SECTION VIEW</span>
         </div>
 
         <div class="schematic-container">
             <!-- Blueprint grid background -->
-            <div class="blueprint-grid"></div>
+            <div class="blueprint-grid" aria-hidden="true"></div>
 
             <!-- Ruler (horizontal, 10-80cm) -->
             <div class="ruler" id="ruler">
@@ -67,7 +67,7 @@ require_once __DIR__ . '/../includes/header.php';
             <!-- Sensor origin marker -->
             <div class="sensor-origin">
                 <div class="sensor-origin-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <path d="M12 2L12 6M12 18L12 22M2 12L6 12M18 12L22 12" stroke="currentColor" stroke-width="1.5"/>
                         <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/>
                         <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
@@ -84,7 +84,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <span class="hold-bar-time" id="hold-bar-time">0.0 / 3.0s</span>
             </div>
             <div class="hold-bar-track">
-                <div class="hold-bar-fill" id="hold-bar-fill"></div>
+                <div class="hold-bar-fill" id="hold-bar-fill" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="3" aria-label="Temps de maintien en zone"></div>
             </div>
         </div>
 
@@ -97,7 +97,7 @@ require_once __DIR__ . '/../includes/header.php';
 <section class="cargo-chart-wrapper animate-in" style="animation-delay: 0.2s">
     <div class="iss-panel">
         <div class="panel-header">
-            <div class="panel-header-marker"></div>
+            <div class="panel-header-marker" aria-hidden="true"></div>
             <h2 class="panel-title">Historique Capteur</h2>
             <div class="chart-period-btns">
                 <button class="period-btn active" data-period="5min">5 MIN</button>
@@ -109,7 +109,7 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="chart-container">
-            <canvas id="history-chart"></canvas>
+            <canvas id="history-chart" aria-label="Graphique historique des mesures du capteur de distance" role="img"></canvas>
         </div>
 
         <div class="chart-footer">

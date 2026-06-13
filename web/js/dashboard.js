@@ -464,17 +464,51 @@
     fetchDashboard();
     fetchSensorLive();
 
-    // Fast loop: capteur (200ms, fichier local = instantane)
-    setInterval(fetchSensorLive, POLL_FAST);
-
-    // Slow loop: salles, alertes, historique (5s, BDD distante)
-    setInterval(fetchDashboard, POLL_SLOW);
-
-    // Session timer tick
-    setInterval(() => {
+    // Polling intervals (stored for eco-conception pause/resume)
+    let pollFastId = setInterval(fetchSensorLive, POLL_FAST);
+    let pollSlowId = setInterval(fetchDashboard, POLL_SLOW);
+    let timerTickId = setInterval(() => {
         if (lastData && lastData.session && lastData.session.status === 'en_cours') {
             updateSession(lastData.session);
         }
     }, 1000);
+
+    // Eco-conception : pause polling when tab is hidden
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            clearInterval(pollFastId);
+            clearInterval(pollSlowId);
+            clearInterval(timerTickId);
+        } else {
+            fetchDashboard();
+            fetchSensorLive();
+            pollFastId = setInterval(fetchSensorLive, POLL_FAST);
+            pollSlowId = setInterval(fetchDashboard, POLL_SLOW);
+            timerTickId = setInterval(() => {
+                if (lastData && lastData.session && lastData.session.status === 'en_cours') {
+                    updateSession(lastData.session);
+                }
+            }, 1000);
+        }
+    });
+
+    // Eco-conception : pause polling when tab is hidden
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            clearInterval(pollFastId);
+            clearInterval(pollSlowId);
+            clearInterval(timerTickId);
+        } else {
+            fetchDashboard();
+            fetchSensorLive();
+            pollFastId = setInterval(fetchSensorLive, POLL_FAST);
+            pollSlowId = setInterval(fetchDashboard, POLL_SLOW);
+            timerTickId = setInterval(() => {
+                if (lastData && lastData.session && lastData.session.status === 'en_cours') {
+                    updateSession(lastData.session);
+                }
+            }, 1000);
+        }
+    });
 
 })();

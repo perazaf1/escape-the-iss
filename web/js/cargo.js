@@ -641,9 +641,25 @@
     fetchSensorLive();
     fetchHistory();
 
-    // Loops
-    setInterval(fetchSensorLive, 200);      // Live sensor (fast)
-    setInterval(fetchDashboard, 5000);       // Steps/alerts (slow)
-    setInterval(fetchHistory, 10000);        // Chart refresh
+    // Loops (stored for eco-conception pause/resume)
+    let pollLiveId = setInterval(fetchSensorLive, 200);
+    let pollDashId = setInterval(fetchDashboard, 5000);
+    let pollHistId = setInterval(fetchHistory, 10000);
+
+    // Eco-conception : pause polling when tab is hidden
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            clearInterval(pollLiveId);
+            clearInterval(pollDashId);
+            clearInterval(pollHistId);
+        } else {
+            fetchSensorLive();
+            fetchDashboard();
+            fetchHistory();
+            pollLiveId = setInterval(fetchSensorLive, 200);
+            pollDashId = setInterval(fetchDashboard, 5000);
+            pollHistId = setInterval(fetchHistory, 10000);
+        }
+    });
 
 })();

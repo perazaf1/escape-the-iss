@@ -55,25 +55,25 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
 
             <?php if ($error): ?>
-                <div class="iss-alert iss-alert-error">&gt; ERREUR : <?= h($error) ?></div>
+                <div class="iss-alert iss-alert-error" role="alert">&gt; ERREUR : <?= h($error) ?></div>
             <?php endif; ?>
 
             <?php if ($success): ?>
-                <div class="iss-alert iss-alert-success">&gt; <?= h($success) ?></div>
+                <div class="iss-alert iss-alert-success" role="status">&gt; <?= h($success) ?></div>
             <?php endif; ?>
 
             <form method="POST" action="" autocomplete="off">
                 <div class="iss-field">
                     <label class="iss-label" for="username">Identifiant equipage</label>
                     <input class="iss-input" type="text" id="username" name="username"
-                           placeholder="call_sign" required minlength="3" maxlength="50"
+                           placeholder="call_sign" required minlength="3" maxlength="50" aria-required="true"
                            value="<?= isset($username) ? h($username) : '' ?>">
                 </div>
 
                 <div class="iss-field">
                     <label class="iss-label" for="email">Canal de communication</label>
                     <input class="iss-input" type="email" id="email" name="email"
-                           placeholder="equipage@iss.space" required
+                           placeholder="equipage@iss.space" required aria-required="true"
                            value="<?= isset($email) ? h($email) : '' ?>">
                 </div>
 
@@ -92,13 +92,13 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="iss-field">
                     <label class="iss-label" for="password">Code acces</label>
                     <input class="iss-input" type="password" id="password" name="password"
-                           placeholder="6 caracteres minimum" required minlength="6">
+                           placeholder="6 caracteres minimum" required minlength="6" aria-required="true">
                 </div>
 
                 <div class="iss-field">
                     <label class="iss-label" for="password_confirm">Confirmer le code</label>
                     <input class="iss-input" type="password" id="password_confirm" name="password_confirm"
-                           placeholder="Repeter le code" required minlength="6">
+                           placeholder="Repeter le code" required minlength="6" aria-required="true">
                 </div>
 
                 <button type="submit" class="iss-btn iss-btn-primary auth-submit">

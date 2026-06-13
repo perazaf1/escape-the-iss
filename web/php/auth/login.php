@@ -46,21 +46,21 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
 
             <?php if ($error): ?>
-                <div class="iss-alert iss-alert-error">&gt; ERREUR : <?= h($error) ?></div>
+                <div class="iss-alert iss-alert-error" role="alert">&gt; ERREUR : <?= h($error) ?></div>
             <?php endif; ?>
 
             <form method="POST" action="" autocomplete="off">
                 <div class="iss-field">
                     <label class="iss-label" for="username">Identifiant equipage</label>
                     <input class="iss-input" type="text" id="username" name="username"
-                           placeholder="call_sign" required
+                           placeholder="call_sign" required aria-required="true"
                            value="<?= isset($username) ? h($username) : '' ?>">
                 </div>
 
                 <div class="iss-field">
                     <label class="iss-label" for="password">Code acces</label>
                     <input class="iss-input" type="password" id="password" name="password"
-                           placeholder="••••••••" required>
+                           placeholder="••••••••" required aria-required="true">
                 </div>
 
                 <button type="submit" class="iss-btn iss-btn-primary auth-submit">

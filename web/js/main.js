@@ -31,7 +31,10 @@
             }
         }
 
+        let starsRunning = true;
+
         function drawStars(time) {
+            if (document.hidden) { starsRunning = false; return; }
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (const s of stars) {
                 const alpha = s.baseAlpha + Math.sin(time * s.speed + s.phase) * 0.2;
@@ -47,6 +50,13 @@
         initStars();
         requestAnimationFrame(drawStars);
         window.addEventListener('resize', () => { resize(); initStars(); });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && !starsRunning) {
+                starsRunning = true;
+                requestAnimationFrame(drawStars);
+            }
+        });
     }
 
     /* --- UTC Clock --- */

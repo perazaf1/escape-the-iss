@@ -19,13 +19,13 @@ $currentPage = basename($_SERVER['SCRIPT_NAME'], '.php');
     <?php endif; ?>
 </head>
 <body>
-    <div class="scanlines"></div>
-    <canvas id="stars-canvas"></canvas>
+    <div class="scanlines" aria-hidden="true"></div>
+    <canvas id="stars-canvas" aria-hidden="true"></canvas>
 
     <nav class="iss-nav">
         <div class="nav-left">
             <div class="nav-logo">
-                <div class="logo-indicator"></div>
+                <div class="logo-indicator" aria-hidden="true"></div>
                 <span class="logo-text">ISS</span>
                 <span class="logo-sub">G5E CARGO BAY</span>
             </div>
@@ -34,24 +34,24 @@ $currentPage = basename($_SERVER['SCRIPT_NAME'], '.php');
         <div class="nav-center">
             <?php if ($currentUser): ?>
             <a href="/index.php" class="nav-link <?= $currentPage === 'index' ? 'active' : '' ?>">
-                <span class="nav-link-indicator"></span>
+                <span class="nav-link-indicator" aria-hidden="true"></span>
                 DASHBOARD
             </a>
             <a href="/php/pages/cargo.php" class="nav-link <?= $currentPage === 'cargo' ? 'active' : '' ?>">
-                <span class="nav-link-indicator"></span>
+                <span class="nav-link-indicator" aria-hidden="true"></span>
                 CARGO
             </a>
             <a href="/php/pages/iss-tracker.php" class="nav-link <?= $currentPage === 'iss-tracker' ? 'active' : '' ?>">
-                <span class="nav-link-indicator"></span>
+                <span class="nav-link-indicator" aria-hidden="true"></span>
                 ISS TRACKER
             </a>
             <a href="/php/pages/journal.php" class="nav-link <?= $currentPage === 'journal' ? 'active' : '' ?>">
-                <span class="nav-link-indicator"></span>
+                <span class="nav-link-indicator" aria-hidden="true"></span>
                 JOURNAL
             </a>
             <?php if ($currentUser['role'] === 'game_master'): ?>
             <a href="#" class="nav-link <?= $currentPage === 'admin' ? 'active' : '' ?>">
-                <span class="nav-link-indicator"></span>
+                <span class="nav-link-indicator" aria-hidden="true"></span>
                 CONTROLE GM
             </a>
             <?php endif; ?>
@@ -66,8 +66,8 @@ $currentPage = basename($_SERVER['SCRIPT_NAME'], '.php');
                 </div>
                 <span class="user-name"><?= h($currentUser['username']) ?></span>
             </div>
-            <a href="/php/auth/logout.php" class="nav-btn-logout" title="Deconnexion">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <a href="/php/auth/logout.php" class="nav-btn-logout" title="Deconnexion" aria-label="Deconnexion">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path d="M6 2H3C2.4 2 2 2.4 2 3V13C2 13.6 2.4 14 3 14H6M11 11L14 8L11 5M6 8H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
                 </svg>
             </a>

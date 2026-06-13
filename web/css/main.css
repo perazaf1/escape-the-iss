@@ -575,3 +575,26 @@ a:hover { color: #fff; }
     .iss-main { padding: 24px 16px; }
     .iss-panel { padding: 20px 18px; }
 }
+
+/* --- ECO-CONCEPTION : Respect reduced motion preference --- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .scanlines {
+        display: none;
+    }
+
+    #stars-canvas {
+        display: none;
+    }
+
+    .logo-indicator {
+        animation: none;
+        opacity: 1;
+    }
+}

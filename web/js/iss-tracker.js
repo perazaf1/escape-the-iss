@@ -247,6 +247,8 @@
     }
 
     // --- MAIN LOOP ---
+    let pollISSId = null;
+
     function init() {
         initMap();
         updateUTC();
@@ -257,10 +259,25 @@
         startCountdown();
 
         // Poll every 5s
-        setInterval(function () {
+        let pollISSId = setInterval(function () {
             fetchISSPosition();
             refreshCountdown = 5;
         }, POLL_INTERVAL);
+
+        // Eco-conception : pause ISS API polling when tab is hidden
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(pollISSId);
+                clearInterval(countdownTimer);
+            } else {
+                fetchISSPosition();
+                startCountdown();
+                pollISSId = setInterval(function () {
+                    fetchISSPosition();
+                    refreshCountdown = 5;
+                }, POLL_INTERVAL);
+            }
+        });
     }
 
     // --- START ---

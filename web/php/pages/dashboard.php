@@ -58,14 +58,14 @@ require_once __DIR__ . '/../includes/header.php';
     <div class="dash-sensor">
         <div class="iss-panel">
             <div class="panel-header">
-                <div class="panel-header-marker"></div>
+                <div class="panel-header-marker" aria-hidden="true"></div>
                 <h2 class="panel-title">Capteur Proximite</h2>
                 <span class="panel-subtitle" id="sensor-status">OFFLINE</span>
             </div>
 
             <!-- SVG Arc Gauge -->
             <div class="gauge-container">
-                <svg class="gauge-svg" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+                <svg class="gauge-svg" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Jauge de distance du capteur de proximite">
                     <!-- Tick marks -->
                     <g class="gauge-ticks" id="gauge-ticks"></g>
 
@@ -120,7 +120,7 @@ require_once __DIR__ . '/../includes/header.php';
             <!-- Sparkline -->
             <div class="sparkline-container">
                 <div class="sparkline-label">HISTORIQUE (30 derniers)</div>
-                <canvas id="sparkline-canvas" width="400" height="60"></canvas>
+                <canvas id="sparkline-canvas" width="400" height="60" aria-hidden="true"></canvas>
             </div>
         </div>
     </div>
@@ -131,7 +131,7 @@ require_once __DIR__ . '/../includes/header.php';
         <!-- Game Session -->
         <div class="iss-panel session-panel">
             <div class="panel-header">
-                <div class="panel-header-marker"></div>
+                <div class="panel-header-marker" aria-hidden="true"></div>
                 <h2 class="panel-title">Session</h2>
                 <span class="panel-subtitle" id="session-status">AUCUNE</span>
             </div>
@@ -144,7 +144,7 @@ require_once __DIR__ . '/../includes/header.php';
         <!-- Enigme Steps -->
         <div class="iss-panel steps-panel">
             <div class="panel-header">
-                <div class="panel-header-marker"></div>
+                <div class="panel-header-marker" aria-hidden="true"></div>
                 <h2 class="panel-title">Enigme Cargo</h2>
                 <span class="panel-subtitle">4 ETAPES</span>
             </div>
@@ -191,7 +191,7 @@ require_once __DIR__ . '/../includes/header.php';
 <section class="dash-alerts">
     <div class="iss-panel">
         <div class="panel-header">
-            <div class="panel-header-marker"></div>
+            <div class="panel-header-marker" aria-hidden="true"></div>
             <h2 class="panel-title">Journal Systeme</h2>
             <span class="panel-subtitle">LIVE FEED</span>
         </div>
