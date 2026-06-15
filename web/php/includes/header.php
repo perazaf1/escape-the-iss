@@ -50,7 +50,7 @@ $currentPage = basename($_SERVER['SCRIPT_NAME'], '.php');
                 JOURNAL
             </a>
             <?php if ($currentUser['role'] === 'game_master'): ?>
-            <a href="#" class="nav-link <?= $currentPage === 'admin' ? 'active' : '' ?>">
+            <a href="/php/pages/admin.php" class="nav-link <?= $currentPage === 'admin' ? 'active' : '' ?>">
                 <span class="nav-link-indicator" aria-hidden="true"></span>
                 CONTROLE GM
             </a>

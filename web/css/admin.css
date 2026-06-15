@@ -1,0 +1,230 @@
+/* ============================================================
+   ISS G5E — Admin / Game Master Panel CSS
+   ============================================================ */
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+.admin-section-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--blue-accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.admin-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.btn-reset-danger {
+    background: rgba(255, 50, 50, 0.1);
+    color: #ff4444;
+    border-color: rgba(255, 50, 50, 0.3);
+    box-shadow: 0 0 15px rgba(255, 50, 50, 0.1);
+}
+.btn-reset-danger:hover {
+    background: rgba(255, 50, 50, 0.2);
+    color: #ff6666;
+    border-color: #ff4444;
+    box-shadow: 0 0 20px rgba(255, 50, 50, 0.3);
+}
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* LEFT: Rooms list */
+.admin-rooms-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+}
+
+.admin-room-card {
+    background: rgba(10, 15, 26, 0.6);
+    border: 1px solid rgba(0, 212, 255, 0.1);
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s ease;
+}
+.admin-room-card.is-ours {
+    border-color: rgba(0, 212, 255, 0.4);
+    background: rgba(0, 212, 255, 0.05);
+}
+
+.admin-room-id {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--cyan-sys);
+    width: 60px;
+}
+.admin-room-name {
+    flex: 1;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--text-dim);
+}
+.admin-room-progress {
+    width: 150px;
+}
+.admin-room-bar {
+    height: 6px;
+    background: rgba(0, 212, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+.admin-room-fill {
+    height: 100%;
+    background: var(--cyan-sys);
+    box-shadow: 0 0 10px var(--cyan-glow);
+    transition: width 1s ease;
+}
+.admin-room-pct {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--cyan-sys);
+    text-align: right;
+}
+
+/* RIGHT: Bypass panel */
+.admin-warning-box {
+    margin: 15px;
+    padding: 15px;
+    background: rgba(255, 107, 43, 0.1);
+    border-left: 3px solid var(--orange-warn);
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+.warning-icon {
+    font-size: 1.5rem;
+    color: var(--orange-warn);
+    line-height: 1;
+}
+.warning-text {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.9rem;
+    color: #ffd0b0;
+    line-height: 1.5;
+}
+
+.admin-steps-list {
+    padding: 0 15px 15px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.admin-step-card {
+    background: rgba(10, 15, 26, 0.8);
+    border: 1px solid rgba(0, 212, 255, 0.15);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-step-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.admin-step-order {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    color: var(--blue-accent);
+}
+.admin-step-status {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    padding: 3px 8px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.05);
+}
+.admin-step-status.locked { color: var(--text-dim); }
+.admin-step-status.pending { color: var(--orange-warn); background: rgba(255, 107, 43, 0.1); }
+.admin-step-status.validated { color: var(--green-sys); background: rgba(0, 255, 136, 0.1); }
+
+.admin-step-title {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-main);
+}
+.admin-step-target {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+}
+
+.admin-step-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.admin-btn {
+    flex: 1;
+    background: transparent;
+    border: 1px solid;
+    padding: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+}
+
+.admin-btn-unlock {
+    color: var(--cyan-sys);
+    border-color: rgba(0, 212, 255, 0.3);
+}
+.admin-btn-unlock:hover {
+    background: rgba(0, 212, 255, 0.1);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+}
+
+.admin-btn-validate {
+    color: var(--green-sys);
+    border-color: rgba(0, 255, 136, 0.3);
+}
+.admin-btn-validate:hover {
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+}
+
+.admin-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+@media (max-width: 900px) {
+    .admin-grid {
+        grid-template-columns: 1fr;
+    }
+}

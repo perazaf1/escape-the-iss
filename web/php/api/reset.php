@@ -15,6 +15,13 @@ if (!authCheck()) {
     exit;
 }
 
+$user = authUser();
+if ($user['role'] !== 'game_master') {
+    http_response_code(403);
+    echo json_encode(['error' => 'Acces refuse : Game Master requis']);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['error' => 'POST uniquement']);

@@ -492,23 +492,6 @@
         }
     });
 
-    // Eco-conception : pause polling when tab is hidden
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            clearInterval(pollFastId);
-            clearInterval(pollSlowId);
-            clearInterval(timerTickId);
-        } else {
-            fetchDashboard();
-            fetchSensorLive();
-            pollFastId = setInterval(fetchSensorLive, POLL_FAST);
-            pollSlowId = setInterval(fetchDashboard, POLL_SLOW);
-            timerTickId = setInterval(() => {
-                if (lastData && lastData.session && lastData.session.status === 'en_cours') {
-                    updateSession(lastData.session);
-                }
-            }, 1000);
-        }
-    });
+
 
 })();

@@ -610,31 +610,10 @@
         return div.innerHTML;
     }
 
-    // --- Reset button ---
-    function initResetButton() {
-        const btn = document.getElementById('btn-reset');
-        if (!btn) return;
-        btn.addEventListener('click', () => {
-            if (!confirm('Remettre toutes les donnees a zero (enigmes + capteur) ?')) return;
-            fetch('/php/api/reset.php', { method: 'POST' })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        resetUnlocked();
-                        stepsData = null;
-                        fetchDashboard();
-                        fetchHistory();
-                    }
-                })
-                .catch(() => {});
-        });
-    }
-
     // --- Init ---
     buildRuler();
     initChart();
     initPeriodButtons();
-    initResetButton();
 
     // Initial fetches
     fetchDashboard();

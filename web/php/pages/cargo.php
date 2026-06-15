@@ -19,7 +19,6 @@ require_once __DIR__ . '/../includes/header.php';
         <h1 class="cargo-title">Equilibrage Station</h1>
     </div>
     <div class="cargo-header-right">
-        <button class="iss-btn btn-reset" id="btn-reset" title="Remettre a zero la session">RESET</button>
         <div class="balance-meter">
             <div class="balance-label">EQUILIBRE GLOBAL</div>
             <div class="balance-bar-track">
