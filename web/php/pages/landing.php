@@ -77,7 +77,7 @@ if (authCheck()) {
                     <div class="block-timestamp">03:52 UTC &mdash; Analyse x&eacute;nobiologique</div>
                     <p class="block-text">
                         D'apr&egrave;s nos analystes, ces cr&eacute;atures souffrent d'une forme rare de <strong class="text-highlight">dyslexie intergalactique</strong> :
-                        elles auraient confondu <span class="text-code">PASQUET</span> avec <span class="text-code">PASQUIER</span>.
+                        elles auraient confondu <span class="text-code">PESQUET</span> avec <span class="text-code">PASQUIER</span>.
                         L'erreur n'a toujours pas &eacute;t&eacute; remarqu&eacute;e de leur c&ocirc;t&eacute;.
                     </p>
                 </div>

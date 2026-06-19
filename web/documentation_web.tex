@@ -1,0 +1,970 @@
+\documentclass[12pt,a4paper]{article}
+
+% ══════════════════════════════════════════════════════════════
+%  PACKAGES
+% ══════════════════════════════════════════════════════════════
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, calc}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{fontawesome5}
+
+% ══════════════════════════════════════════════════════════════
+%  COULEURS PERSONNALISÉES
+% ══════════════════════════════════════════════════════════════
+\definecolor{cyanbg}{HTML}{0a0a1a}
+\definecolor{cyanaccent}{HTML}{00d4ff}
+\definecolor{purpleaccent}{HTML}{a855f7}
+\definecolor{greenaccent}{HTML}{22c55e}
+\definecolor{codebg}{HTML}{1e1e2e}
+\definecolor{codecomment}{HTML}{6a9955}
+\definecolor{codestring}{HTML}{ce9178}
+\definecolor{codekeyword}{HTML}{569cd6}
+\definecolor{linkcolor}{HTML}{00a8cc}
+
+% ══════════════════════════════════════════════════════════════
+%  STYLE DES LIENS
+% ══════════════════════════════════════════════════════════════
+\hypersetup{
+    colorlinks=true,
+    linkcolor=linkcolor,
+    urlcolor=linkcolor,
+    citecolor=linkcolor,
+}
+
+% ══════════════════════════════════════════════════════════════
+%  STYLE DU CODE
+% ══════════════════════════════════════════════════════════════
+\lstset{
+    backgroundcolor=\color{codebg!10},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{codekeyword}\bfseries,
+    commentstyle=\color{codecomment}\itshape,
+    stringstyle=\color{codestring},
+    numberstyle=\tiny\color{gray},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    frame=single,
+    rulecolor=\color{cyanaccent!30},
+    tabsize=4,
+    showstringspaces=false,
+    captionpos=b,
+    literate={é}{{\'e}}1 {è}{{\`e}}1 {ê}{{\^e}}1 {à}{{\`a}}1 {ù}{{\`u}}1
+             {î}{{\^i}}1 {ô}{{\^o}}1 {ç}{{\c{c}}}1 {û}{{\^u}}1
+}
+
+% ══════════════════════════════════════════════════════════════
+%  BOÎTES PERSONNALISÉES
+% ══════════════════════════════════════════════════════════════
+\newtcolorbox{conceptbox}[1]{
+    colback=cyanaccent!5,
+    colframe=cyanaccent!60,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+\newtcolorbox{warningbox}[1]{
+    colback=red!5,
+    colframe=red!60,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+\newtcolorbox{tipbox}[1]{
+    colback=greenaccent!5,
+    colframe=greenaccent!60,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+% ══════════════════════════════════════════════════════════════
+%  EN-TÊTE / PIED DE PAGE
+% ══════════════════════════════════════════════════════════════
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{cyanaccent}{\textbf{Escape the ISS}}}
+\fancyhead[R]{\textcolor{gray}{Documentation Web}}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ══════════════════════════════════════════════════════════════
+%  TITRE
+% ══════════════════════════════════════════════════════════════
+\title{
+    \vspace{-1cm}
+    {\Huge\textcolor{cyanaccent}{\textbf{Escape the ISS}}}\\[0.3cm]
+    {\Large Documentation technique du dossier \texttt{web/}}\\[0.2cm]
+    {\normalsize Guide pour comprendre l'architecture, les fichiers et leurs connexions}
+}
+\author{Projet commun ISEP --- Année 1}
+\date{\today}
+
+% ══════════════════════════════════════════════════════════════
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+\begin{abstract}
+Ce document explique, de manière accessible, comment est organisé le dossier \texttt{web/} du projet \textbf{Escape the ISS}. Tu y trouveras~: l'arborescence des fichiers, le rôle de chaque dossier, comment les fichiers sont connectés entre eux, et des explications sur le code principal. Le tout est illustré avec des schémas pour t'aider à visualiser les liens.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 1 : VUE D'ENSEMBLE
+% ══════════════════════════════════════════════════════════════
+\section{Vue d'ensemble du projet}
+
+\subsection{C'est quoi « Escape the ISS » ?}
+
+\textbf{Escape the ISS} est un \textbf{escape game en ligne} dont l'action se déroule à bord de la Station Spatiale Internationale (ISS). Les joueurs doivent~:
+\begin{itemize}[leftmargin=2cm]
+    \item[\faRocket] Suivre un scénario \textbf{étape par étape} (Mission Control)
+    \item[\faBox] Gérer des objets dans la \textbf{soute} (Cargo Bay)
+    \item[\faGlobeEurope] Suivre la position de l'\textbf{ISS en temps réel} (ISS Tracker)
+    \item[\faPen] Tenir un \textbf{journal de bord} partagé (Journal)
+\end{itemize}
+
+\subsection{Les technologies utilisées}
+
+\begin{conceptbox}{\faCode\ Stack technique}
+\begin{tabularx}{\textwidth}{lX}
+    \toprule
+    \textbf{Technologie} & \textbf{Rôle} \\
+    \midrule
+    \textbf{PHP}        & Langage côté serveur --- gère la logique, l'authentification, les requêtes à la base de données \\
+    \textbf{MySQL}      & Base de données --- stocke les utilisateurs, les étapes du jeu, le journal, etc. \\
+    \textbf{HTML}       & Structure des pages web (le squelette) \\
+    \textbf{CSS}        & Mise en forme visuelle (les couleurs, la taille, les animations) \\
+    \textbf{JavaScript} & Interactivité côté client (actions sans recharger la page, carte, animations) \\
+    \textbf{Leaflet}    & Bibliothèque JS pour afficher une carte interactive (ISS Tracker) \\
+    \bottomrule
+\end{tabularx}
+\end{conceptbox}
+
+\begin{tipbox}{\faLightbulb\ Côté serveur vs. côté client}
+\begin{itemize}
+    \item \textbf{Côté serveur (PHP)}~: le code s'exécute sur le serveur \textit{avant} que la page soit envoyée au navigateur. Le visiteur ne voit jamais le code PHP.
+    \item \textbf{Côté client (JS/CSS/HTML)}~: le code est envoyé au navigateur et s'exécute sur l'ordinateur du visiteur.
+\end{itemize}
+\end{tipbox}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 2 : ARBORESCENCE
+% ══════════════════════════════════════════════════════════════
+\section{Arborescence des fichiers}
+
+Voici la structure complète du dossier \texttt{web/}~:
+
+\begin{lstlisting}[language={}, title={\texttt{web/} --- Arborescence complète}]
+web/
+|-- index.php               (Point d'entree principal)
+|-- css/
+|   |-- main.css            (Styles globaux, navbar, boutons)
+|   |-- landing.css         (Page d'accueil publique)
+|   |-- auth.css            (Login / Register)
+|   |-- dashboard.css       (Mission Control)
+|   |-- cargo.css           (Cargo Bay)
+|   |-- iss-tracker.css     (ISS Tracker)
+|   |-- journal.css         (Journal de bord)
+|   |-- admin.css           (Panel admin)
+|-- js/
+|   |-- main.js             (Fonctions partagees: menu, fetch)
+|   |-- landing.js          (Etoiles animees, scroll)
+|   |-- admin.js            (Actions admin)
+|   |-- dashboard.js        (Avancer etape, capteurs)
+|   |-- cargo.js            (CRUD objets cargo)
+|   |-- iss-tracker.js      (Carte Leaflet, API ISS)
+|   |-- journal.js          (CRUD journal)
+|-- php/
+    |-- includes/
+    |   |-- auth.php         (Fonctions authentification)
+    |   |-- db.php           (Connexion base de donnees)
+    |   |-- db.config.php    (Identifiants BDD)
+    |   |-- header.php       (En-tete HTML + navbar)
+    |   |-- footer.php       (Pied de page + script main.js)
+    |-- auth/
+    |   |-- login.php        (Formulaire de connexion)
+    |   |-- register.php     (Formulaire d'inscription)
+    |   |-- logout.php       (Deconnexion)
+    |-- pages/
+    |   |-- landing.php      (Page d'accueil publique)
+    |   |-- dashboard.php    (Mission Control)
+    |   |-- cargo.php        (Gestion du cargo)
+    |   |-- iss-tracker.php  (Tracker ISS)
+    |   |-- journal.php      (Journal de bord)
+    |   |-- admin.php        (Panel admin)
+    |-- api/
+        |-- dashboard.php    (API: donnees du jeu + cargo)
+        |-- force_step.php   (API: forcer une etape)
+        |-- unlock_step.php  (API: debloquer une etape)
+        |-- reset.php        (API: reinitialiser le jeu)
+        |-- history.php      (API: historique du jeu)
+        |-- journal.php      (API: CRUD journal)
+        |-- sensor_live.php  (API: donnees capteurs simules)
+\end{lstlisting}
+
+\begin{conceptbox}{\faFolderOpen\ Rôle de chaque dossier}
+\begin{description}[leftmargin=2.5cm, style=nextline]
+    \item[\texttt{css/}] Contient tous les fichiers de style. Chaque page a son propre fichier CSS + un fichier global \texttt{main.css}.
+    \item[\texttt{js/}] Contient le JavaScript. Même logique~: un fichier \texttt{main.js} partagé + un fichier par page.
+    \item[\texttt{php/includes/}] Les fichiers « utilitaires » réutilisés partout~: connexion BDD, authentification, header/footer.
+    \item[\texttt{php/auth/}] Les pages d'authentification (login, register, logout).
+    \item[\texttt{php/pages/}] Les pages visibles par l'utilisateur connecté.
+    \item[\texttt{php/api/}] Les « endpoints » API~: du PHP qui renvoie du JSON (pas du HTML). Le JavaScript les appelle pour lire/écrire des données.
+\end{description}
+\end{conceptbox}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 3 : SCHÉMA GLOBAL DES CONNEXIONS
+% ══════════════════════════════════════════════════════════════
+\section{Schéma global des connexions}
+
+Le diagramme ci-dessous montre comment les différentes couches communiquent~:
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=1.2cm and 2cm,
+    every node/.style={font=\small},
+    box/.style={draw, rounded corners=8pt, minimum width=3cm, minimum height=1cm, align=center, thick},
+    userbox/.style={box, fill=purpleaccent!15, draw=purpleaccent!60},
+    phpbox/.style={box, fill=cyanaccent!15, draw=cyanaccent!60},
+    jsbox/.style={box, fill=greenaccent!15, draw=greenaccent!60},
+    dbbox/.style={box, fill=orange!15, draw=orange!60},
+    apibox/.style={box, fill=yellow!10, draw=yellow!60!black},
+    arrow/.style={-{Stealth[length=3mm]}, thick},
+]
+
+% Navigateur
+\node[userbox] (browser) {\faDesktop\ \textbf{Navigateur}\\(HTML + CSS + JS)};
+
+% Serveur PHP
+\node[phpbox, below=2cm of browser] (server) {\faServer\ \textbf{Serveur PHP}\\(pages + includes)};
+
+% API
+\node[apibox, right=3cm of server] (api) {\faCogs\ \textbf{API PHP}\\(renvoie du JSON)};
+
+% Base de données
+\node[dbbox, below=2cm of server] (db) {\faDatabase\ \textbf{MySQL}\\(escape\_iss)};
+
+% JavaScript
+\node[jsbox, right=3cm of browser] (js) {\faJs\ \textbf{JavaScript}\\(cargo.js, etc.)};
+
+% Flèches
+\draw[arrow] (browser) -- node[left, align=right] {Demande\\une page} (server);
+\draw[arrow] (server) -- node[left, align=right] {Requête\\SQL} (db);
+\draw[arrow] (db) -- node[right, align=left] {Résultats} (server);
+\draw[arrow] (server) -- node[right, align=left] {HTML\\généré} (browser);
+
+\draw[arrow] (js) -- node[right, align=left] {fetch()\\(AJAX)} (api);
+\draw[arrow] (api) -- node[right, align=left] {JSON} (js);
+\draw[arrow, dashed] (api) -- node[below] {SQL} (db);
+
+\draw[arrow, dashed, cyanaccent] (browser) -- node[above] {Contient} (js);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{tipbox}{\faLightbulb\ Deux façons de communiquer avec le serveur}
+\begin{enumerate}
+    \item \textbf{Navigation classique}~: tu cliques sur un lien $\to$ le navigateur demande une nouvelle page PHP $\to$ le serveur génère le HTML et te l'envoie. La page se \textit{recharge}.
+    \item \textbf{AJAX (fetch)}~: le JavaScript envoie une requête « en arrière-plan » à l'API $\to$ l'API répond en JSON $\to$ le JS met à jour la page \textit{sans la recharger}. C'est comme ça que le Cargo Bay ajoute des objets, que le journal poste des entrées, etc.
+\end{enumerate}
+\end{tipbox}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 4 : LE POINT D'ENTRÉE (index.php)
+% ══════════════════════════════════════════════════════════════
+\section{Le point d'entrée~: \texttt{index.php}}
+
+Quand quelqu'un tape l'URL du site, c'est \texttt{index.php} qui s'exécute en premier~:
+
+\begin{lstlisting}[language=PHP, title={\texttt{index.php}}]
+<?php
+require_once __DIR__ . '/php/includes/auth.php';
+authStart();
+
+if (!authCheck()) {
+    header('Location: /php/pages/landing.php');
+    exit;
+}
+
+header('Location: /php/pages/dashboard.php');
+exit;
+\end{lstlisting}
+
+\begin{conceptbox}{\faRoute\ Que fait ce code ?}
+\begin{enumerate}
+    \item Il charge le fichier \texttt{auth.php} (qui contient les fonctions d'authentification).
+    \item Il démarre la session PHP avec \texttt{authStart()}.
+    \item Il vérifie si l'utilisateur est connecté avec \texttt{authCheck()}.
+    \item \textbf{Pas connecté}~: redirection vers la page d'accueil (\texttt{landing.php}).
+    \item \textbf{Connecté}~: redirection vers le tableau de bord (\texttt{dashboard.php}).
+\end{enumerate}
+C'est un \textbf{aiguilleur}~: il ne contient aucun HTML, il redirige juste au bon endroit.
+\end{conceptbox}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 5 : LES FICHIERS INCLUDES (la « boîte à outils »)
+% ══════════════════════════════════════════════════════════════
+\section{Les fichiers \texttt{includes/}~: la boîte à outils}
+
+Ces fichiers sont les \textbf{briques réutilisables} du projet. Ils ne sont jamais accédés directement par l'utilisateur~; ils sont \textbf{inclus} (\texttt{require\_once}) par les autres fichiers PHP.
+
+\subsection{\texttt{db.config.php} --- Configuration de la BDD}
+
+\begin{lstlisting}[language=PHP, title={\texttt{php/includes/db.config.php}}]
+<?php
+return [
+    'host'     => '127.0.0.1',
+    'port'     => '3306',
+    'dbname'   => 'escape_iss',
+    'username' => 'root',
+    'password' => '',
+    'charset'  => 'utf8mb4',
+];
+\end{lstlisting}
+
+Ce fichier contient simplement les \textbf{identifiants} pour se connecter à MySQL. Il retourne un tableau PHP. Le fichier \texttt{db.config.example.php} est une copie « vide » à distribuer (pour ne pas partager ses vrais mots de passe).
+
+\subsection{\texttt{db.php} --- Connexion à la base de données}
+
+\begin{lstlisting}[language=PHP, title={\texttt{php/includes/db.php}}]
+<?php
+function getDB(): PDO
+{
+    static $pdo = null;          // Singleton : créé une seule fois
+    if ($pdo === null) {
+        $cfg = require __DIR__ . '/db.config.php';  // Charge la config
+        $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=%s',
+            $cfg['host'], $cfg['port'], $cfg['dbname'], $cfg['charset']);
+        $pdo = new PDO($dsn, $cfg['username'], $cfg['password'], [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
+    }
+    return $pdo;
+}
+\end{lstlisting}
+
+\begin{conceptbox}{\faDatabase\ Explication}
+\begin{itemize}
+    \item \textbf{PDO} = « PHP Data Objects »~: c'est la manière standard de parler à une base de données en PHP.
+    \item \textbf{Singleton} (\texttt{static \$pdo})~: la connexion n'est créée qu'\textbf{une seule fois}. Si on appelle \texttt{getDB()} 10 fois, on réutilise toujours la même connexion. C'est plus efficace.
+    \item Le \texttt{DSN} (Data Source Name) est la « chaîne de connexion » qui dit à PHP~: « connecte-toi à cette base MySQL, sur ce port, avec ce charset ».
+\end{itemize}
+\end{conceptbox}
+
+\subsection{\texttt{auth.php} --- Fonctions d'authentification}
+
+Ce fichier fournit \textbf{5 fonctions} utilisées partout~:
+
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{lX}
+    \toprule
+    \textbf{Fonction} & \textbf{Rôle} \\
+    \midrule
+    \texttt{authStart()} & Démarre la session PHP (comme ouvrir un tiroir de cookies côté serveur) \\
+    \texttt{authCheck()} & Retourne \texttt{true} si l'utilisateur est connecté (vérifie \texttt{\$\_SESSION['user\_id']}) \\
+    \texttt{authRequire()} & Redirige vers le login si pas connecté. \textbf{Garde} la page. \\
+    \texttt{authUser()} & Retourne les infos de l'utilisateur depuis la BDD (username, email, etc.) \\
+    \texttt{authIsAdmin()} & Retourne \texttt{true} si le champ \texttt{is\_admin} vaut 1 en BDD \\
+    \bottomrule
+\end{tabularx}
+\caption{Les 5 fonctions d'authentification}
+\end{table}
+
+\begin{warningbox}{\faExclamationTriangle\ Pourquoi \texttt{authRequire()} est important}
+Sans cette fonction, n'importe qui pourrait accéder aux pages protégées en tapant directement l'URL. \texttt{authRequire()} est appelée au début de chaque page qui nécessite d'être connecté (dashboard, cargo, journal, etc.).
+\end{warningbox}
+
+\subsection{\texttt{header.php} et \texttt{footer.php} --- Le « cadre » des pages}
+
+\begin{conceptbox}{\faPuzzlePiece\ Le principe du header/footer}
+Plutôt que de copier-coller la navbar et le \texttt{<head>} dans chaque page, on les met dans \textbf{un seul fichier} (\texttt{header.php}). Chaque page l'inclut avec \texttt{require\_once}. Pareil pour le footer.
+
+Résultat~: si tu veux changer le menu, tu ne modifies qu'\textbf{un seul fichier}.
+\end{conceptbox}
+
+\texttt{header.php} fait ceci~:
+\begin{enumerate}
+    \item Charge \texttt{auth.php} et démarre la session
+    \item Récupère les infos de l'utilisateur connecté
+    \item Génère le \texttt{<!DOCTYPE html>}, le \texttt{<head>} (avec les CSS), et la \texttt{<header>} (navbar)
+    \item Affiche le lien « Admin » uniquement si l'utilisateur est admin
+    \item Ouvre la balise \texttt{<main>}
+\end{enumerate}
+
+\texttt{footer.php} fait l'inverse~:
+\begin{enumerate}
+    \item Ferme la balise \texttt{<main>}
+    \item Affiche le \texttt{<footer>} avec les liens
+    \item Charge \texttt{main.js} (le JS global)
+    \item Ferme \texttt{</body></html>}
+\end{enumerate}
+
+Chaque page protégée suit donc ce schéma~:
+
+\begin{lstlisting}[language=PHP, title={Schéma type d'une page}]
+<?php
+$pageTitle = 'Ma Page';
+$pageCSS   = 'ma-page';       // => charge /css/ma-page.css
+require_once __DIR__ . '/../includes/header.php';
+authRequire();                 // Bloque si pas connecté
+?>
+
+<!-- Contenu HTML de la page ici -->
+
+<script src="/js/ma-page.js"></script>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
+\end{lstlisting}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 6 : SCHÉMA D'INCLUSION DES FICHIERS
+% ══════════════════════════════════════════════════════════════
+\section{Schéma d'inclusion~: qui inclut qui ?}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=0.8cm and 1.5cm,
+    every node/.style={font=\footnotesize},
+    inc/.style={draw, rounded corners=6pt, minimum width=2.5cm, minimum height=0.7cm, align=center, thick, fill=cyanaccent!10, draw=cyanaccent!50},
+    page/.style={draw, rounded corners=6pt, minimum width=2.5cm, minimum height=0.7cm, align=center, thick, fill=purpleaccent!10, draw=purpleaccent!50},
+    arr/.style={-{Stealth[length=2mm]}, thick, gray},
+]
+
+% Includes
+\node[inc] (auth) {\texttt{auth.php}};
+\node[inc, right=2cm of auth] (db) {\texttt{db.php}};
+\node[inc, right=2cm of db] (dbcfg) {\texttt{db.config.php}};
+\node[inc, below=1cm of auth] (header) {\texttt{header.php}};
+\node[inc, right=2cm of header] (footer) {\texttt{footer.php}};
+
+% Pages
+\node[page, below=2cm of header] (dash) {\texttt{dashboard.php}};
+\node[page, left=1.5cm of dash] (cargo) {\texttt{cargo.php}};
+\node[page, right=1.5cm of dash] (tracker) {\texttt{iss-tracker.php}};
+\node[page, below=0.8cm of cargo] (journal) {\texttt{journal.php}};
+\node[page, below=0.8cm of dash] (admin) {\texttt{admin.php}};
+\node[page, below=0.8cm of tracker] (landing) {\texttt{landing.php}};
+
+% Index
+\node[page, above=2.5cm of auth, xshift=2cm] (index) {\texttt{index.php}};
+
+% Connexions includes
+\draw[arr] (db) -- (dbcfg);
+\draw[arr] (auth) -- (db);
+\draw[arr] (header) -- (auth);
+
+% Pages -> header/footer
+\foreach \p in {dash, cargo, tracker, journal, admin} {
+    \draw[arr] (\p) -- (header);
+    \draw[arr] (\p) -- (footer);
+}
+
+% Dashboard -> db
+\draw[arr] (dash) to[bend right=20] (db);
+
+% Landing -> auth (directement, pas header)
+\draw[arr] (landing) to[bend left=30] (auth);
+
+% Index -> auth
+\draw[arr] (index) -- (auth);
+
+\end{tikzpicture}
+\end{center}
+
+\begin{tipbox}{\faProjectDiagram\ Comment lire ce schéma}
+Les flèches signifient « \textbf{inclut} » (via \texttt{require\_once}). Par exemple~:
+\begin{itemize}
+    \item \texttt{dashboard.php} inclut \texttt{header.php} et \texttt{footer.php}
+    \item \texttt{header.php} inclut \texttt{auth.php}
+    \item \texttt{auth.php} inclut \texttt{db.php} (quand on appelle \texttt{authUser()})
+    \item \texttt{db.php} charge \texttt{db.config.php}
+\end{itemize}
+La page \texttt{landing.php} est spéciale~: elle n'utilise pas \texttt{header.php}/\texttt{footer.php} car elle a son propre design (page d'accueil publique).
+\end{tipbox}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 7 : L'AUTHENTIFICATION
+% ══════════════════════════════════════════════════════════════
+\section{L'authentification (login / register / logout)}
+
+\subsection{Comment fonctionne le login ?}
+
+\begin{enumerate}
+    \item L'utilisateur remplit le formulaire (username + password).
+    \item Le formulaire est envoyé en \textbf{POST} au même fichier \texttt{login.php}.
+    \item PHP cherche le username dans la table \texttt{users} de la BDD.
+    \item Il vérifie le mot de passe avec \texttt{password\_verify()} (qui compare le hash stocké).
+    \item Si c'est bon~: on stocke l'ID utilisateur dans \texttt{\$\_SESSION['user\_id']} et on redirige vers le dashboard.
+    \item Sinon~: on affiche un message d'erreur.
+\end{enumerate}
+
+\begin{conceptbox}{\faLock\ C'est quoi un hash de mot de passe ?}
+On ne stocke \textbf{jamais} un mot de passe « en clair » dans une base de données. On le transforme avec \texttt{password\_hash()} en une chaîne illisible (le « hash »). Pour vérifier, on utilise \texttt{password\_verify()} qui compare le mot de passe tapé au hash stocké. Même si quelqu'un pirate la BDD, il ne peut pas retrouver les mots de passe.
+\end{conceptbox}
+
+\subsection{L'inscription (\texttt{register.php})}
+
+Le processus est similaire mais avec plus de validations~:
+\begin{itemize}
+    \item Username minimum 3 caractères
+    \item Email valide
+    \item Mot de passe minimum 6 caractères
+    \item Confirmation du mot de passe
+    \item Vérification que le username et l'email ne sont pas déjà pris
+\end{itemize}
+
+\subsection{La déconnexion (\texttt{logout.php})}
+
+C'est le fichier le plus simple du projet --- 5 lignes~:
+\begin{lstlisting}[language=PHP]
+<?php
+require_once __DIR__ . '/../includes/auth.php';
+authStart();
+session_destroy();   // Supprime toute la session
+header('Location: /php/pages/landing.php');
+exit;
+\end{lstlisting}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 8 : LES PAGES PRINCIPALES
+% ══════════════════════════════════════════════════════════════
+\section{Les pages principales}
+
+\subsection{\texttt{landing.php} --- La page d'accueil}
+
+C'est la \textbf{seule page publique} (pas besoin d'être connecté). Elle sert de vitrine pour le projet.
+
+\textbf{Particularité}~: elle n'utilise pas \texttt{header.php}/\texttt{footer.php}. Elle a son propre HTML complet parce que son design est très différent (page plein écran avec animation d'étoiles).
+
+\textbf{Fichiers associés}~:
+\begin{itemize}
+    \item \texttt{css/landing.css} --- styles de la page d'accueil (hero, glitch effect, étoiles)
+    \item \texttt{js/landing.js} --- animation du canvas d'étoiles + scroll animations
+\end{itemize}
+
+\textbf{Éléments clés}~:
+\begin{itemize}
+    \item \texttt{<canvas id="starsCanvas">}~: un fond d'étoiles animées dessinées en JavaScript
+    \item Effet « glitch » sur le titre (animation CSS avec \texttt{::before}/\texttt{::after})
+    \item Boutons CTA (Call To Action) vers login et register
+    \item Grille de « features » présentant les 4 modules
+\end{itemize}
+
+\subsection{\texttt{dashboard.php} --- Mission Control}
+
+C'est le \textbf{tableau de bord principal}. Il affiche l'état du scénario du jeu.
+
+\textbf{Données serveur}~: contrairement aux autres pages, le dashboard charge des données directement depuis PHP~:
+\begin{itemize}
+    \item L'étape actuelle (\texttt{game\_state} table)
+    \item La liste des étapes (\texttt{steps} table)
+    \item Le nombre d'entrées d'historique (\texttt{game\_history} table)
+    \item Les étapes débloquées (\texttt{unlocked\_steps} table)
+\end{itemize}
+
+\textbf{Fichiers associés}~:
+\begin{itemize}
+    \item \texttt{css/dashboard.css}
+    \item \texttt{js/dashboard.js} --- bouton « avancer d'une étape » + affichage capteurs en temps réel
+\end{itemize}
+
+\subsection{\texttt{cargo.php} --- Cargo Bay}
+
+Page de \textbf{gestion d'objets} (CRUD~: Create, Read, Update, Delete).
+
+\textbf{Tout se fait en JavaScript}~: la page PHP fournit le squelette HTML (tableau vide, modal), et \texttt{cargo.js} remplit tout dynamiquement via l'API.
+
+\textbf{Fonctionnalités}~:
+\begin{itemize}
+    \item Recherche et filtrage par catégorie
+    \item Statistiques (nombre d'objets, poids total, catégories)
+    \item Modal pour ajouter/modifier un objet
+    \item Suppression avec confirmation
+\end{itemize}
+
+\subsection{\texttt{iss-tracker.php} --- ISS Tracker}
+
+Affiche la \textbf{position en temps réel de l'ISS} sur une carte Leaflet.
+
+\textbf{APIs externes utilisées}~:
+\begin{itemize}
+    \item \texttt{api.open-notify.org/iss-now.json}~: position actuelle (lat/lon)
+    \item \texttt{api.open-notify.org/astros.json}~: liste des astronautes à bord
+    \item \texttt{api.open-notify.org/iss-pass.json}~: prochain passage au-dessus de l'utilisateur
+\end{itemize}
+
+La carte se met à jour toutes les 5 secondes (\texttt{setInterval}).
+
+\subsection{\texttt{journal.php} --- Journal de bord}
+
+Un \textbf{journal partagé} où les joueurs peuvent poster des entrées. Utilise l'API \texttt{/php/api/journal.php} en AJAX.
+
+\subsection{\texttt{admin.php} --- Panel d'administration}
+
+Accessible uniquement aux \textbf{administrateurs}. Permet de~:
+\begin{itemize}
+    \item Forcer le jeu à une étape précise
+    \item Débloquer une étape spécifique
+    \item Réinitialiser tout le jeu
+\end{itemize}
+
+\begin{warningbox}{\faLock\ Double protection}
+La page \texttt{admin.php} vérifie deux choses~:
+\begin{enumerate}
+    \item L'utilisateur est connecté (\texttt{authRequire()})
+    \item L'utilisateur est admin (\texttt{authIsAdmin()})
+\end{enumerate}
+Les APIs admin (\texttt{force\_step.php}, \texttt{reset.php}, \texttt{unlock\_step.php}) font la même double vérification côté serveur.
+\end{warningbox}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 9 : L'API (les endpoints JSON)
+% ══════════════════════════════════════════════════════════════
+\section{L'API~: les endpoints JSON}
+
+\begin{conceptbox}{\faCogs\ C'est quoi une API ?}
+Dans ce projet, l'« API » est un ensemble de fichiers PHP dans \texttt{php/api/} qui ne renvoient \textbf{pas du HTML} mais du \textbf{JSON} (un format de données léger). Le JavaScript appelle ces endpoints pour lire ou écrire des données \textit{sans recharger la page}.
+\end{conceptbox}
+
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{llX}
+    \toprule
+    \textbf{Endpoint} & \textbf{Méthode(s)} & \textbf{Rôle} \\
+    \midrule
+    \texttt{/api/dashboard.php} & GET & Récupère l'étape actuelle, la liste des étapes, les étapes débloquées, et les données cargo \\
+    \texttt{/api/force\_step.php} & POST & Force le jeu à une étape donnée (admin) \\
+    \texttt{/api/unlock\_step.php} & POST & Débloque une étape spécifique (admin) \\
+    \texttt{/api/reset.php} & POST & Réinitialise le jeu complètement (admin) \\
+    \texttt{/api/history.php} & GET & Récupère les 100 dernières entrées d'historique \\
+    \texttt{/api/journal.php} & GET/POST/DELETE & Liste, crée ou supprime des entrées de journal \\
+    \texttt{/api/sensor\_live.php} & GET & Renvoie des données de capteurs simulées (O$_2$, CO$_2$, température, etc.) \\
+    \bottomrule
+\end{tabularx}
+\caption{Résumé des endpoints API}
+\end{table}
+
+\subsection{Comment le JavaScript appelle l'API}
+
+Le fichier \texttt{main.js} définit une fonction \texttt{apiFetch()} qui simplifie les appels~:
+
+\begin{lstlisting}[language=Java, title={\texttt{js/main.js} --- Fonction apiFetch}]
+async function apiFetch(url, options = {}) {
+    const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json',
+                   ...options.headers },
+        ...options,
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+    }
+    return res.json();
+}
+\end{lstlisting}
+
+\begin{tipbox}{\faLightbulb\ Ce que fait \texttt{apiFetch}}
+\begin{enumerate}
+    \item Envoie une requête HTTP à l'URL donnée (avec le header JSON)
+    \item Si la réponse n'est pas OK (erreur 4xx/5xx), lance une erreur
+    \item Sinon, retourne les données JSON parsées
+\end{enumerate}
+Toutes les pages utilisent cette fonction au lieu d'appeler \texttt{fetch()} directement.
+\end{tipbox}
+
+\subsection{Exemple concret~: poster une entrée de journal}
+
+\begin{lstlisting}[language=Java, title={Appel API depuis \texttt{journal.js}}]
+// L'utilisateur clique sur "Post Entry"
+form.addEventListener('submit', async e => {
+    e.preventDefault();  // Empeche le rechargement de la page
+    await apiFetch('/php/api/journal.php', {
+        method: 'POST',
+        body: JSON.stringify({ content: content.value }),
+    });
+    content.value = '';   // Vide le champ
+    await loadEntries();  // Recharge la liste
+});
+\end{lstlisting}
+
+Côté serveur, \texttt{api/journal.php} reçoit la requête POST, extrait le contenu, l'insère en BDD, et renvoie \texttt{\{"ok": true\}}.
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 10 : CONNEXIONS PAGE ↔ CSS ↔ JS ↔ API
+% ══════════════════════════════════════════════════════════════
+\section{Tableau des connexions~: Page $\leftrightarrow$ CSS $\leftrightarrow$ JS $\leftrightarrow$ API}
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabularx}{\textwidth}{lllX}
+    \toprule
+    \textbf{Page PHP} & \textbf{CSS} & \textbf{JS} & \textbf{API appelée(s)} \\
+    \midrule
+    \texttt{landing.php} & \texttt{main + landing} & \texttt{landing.js} & Aucune \\
+    \texttt{login.php} & \texttt{main + auth} & \texttt{landing.js} & Aucune (formulaire POST classique) \\
+    \texttt{register.php} & \texttt{main + auth} & \texttt{landing.js} & Aucune (formulaire POST classique) \\
+    \texttt{dashboard.php} & \texttt{main + dashboard} & \texttt{main + dashboard.js} & \texttt{dashboard, force\_step, sensor\_live, history} \\
+    \texttt{cargo.php} & \texttt{main + cargo} & \texttt{main + cargo.js} & \texttt{dashboard (entity=cargo)} \\
+    \texttt{iss-tracker.php} & \texttt{main + iss-tracker} & \texttt{main + iss-tracker.js} & APIs externes (Open Notify) \\
+    \texttt{journal.php} & \texttt{main + journal} & \texttt{main + journal.js} & \texttt{journal} \\
+    \texttt{admin.php} & \texttt{main + admin} & \texttt{main + admin.js} & \texttt{force\_step, unlock\_step, reset} \\
+    \bottomrule
+\end{tabularx}
+\caption{Matrice complète des dépendances par page}
+\end{table}
+
+\begin{tipbox}{\faLightbulb\ Convention de nommage}
+Le projet suit une convention simple~: chaque page \texttt{X.php} a un fichier \texttt{X.css} et un fichier \texttt{X.js} associés. Le fichier CSS est chargé automatiquement par \texttt{header.php} grâce à la variable \texttt{\$pageCSS}, et le fichier JS est inclus manuellement avec une balise \texttt{<script>} en bas de la page.
+\end{tipbox}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 11 : LE CSS (le style visuel)
+% ══════════════════════════════════════════════════════════════
+\section{Le CSS~: le style visuel}
+
+\subsection{Le fichier global~: \texttt{main.css}}
+
+C'est le fichier le plus important côté style. Il définit~:
+
+\begin{itemize}
+    \item Les \textbf{variables CSS} (couleurs, polices, espacements) dans \texttt{:root}
+    \item Le \textbf{reset} (tous les éléments commencent avec 0 margin/padding)
+    \item Le style du \textbf{body} (fond sombre, police Rajdhani)
+    \item La \textbf{navbar} (sticky, glassmorphism, hamburger mobile)
+    \item Les \textbf{boutons} (\texttt{.btn-primary}, \texttt{.btn-outline}, \texttt{.btn-danger})
+    \item Le \textbf{responsive} (media queries pour mobile)
+\end{itemize}
+
+\begin{conceptbox}{\faPalette\ Le thème visuel}
+Le projet utilise un thème \textbf{sombre spatial}~:
+\begin{itemize}
+    \item Fond très sombre (\texttt{\#0a0a1a})
+    \item Accent cyan (\texttt{\#00d4ff}) --- couleur principale
+    \item Accent violet (\texttt{\#a855f7}) --- couleur secondaire
+    \item Police titre~: \textbf{Orbitron} (police futuriste)
+    \item Police corps~: \textbf{Rajdhani} (lisible, style tech)
+    \item Effet \textbf{glassmorphism}~: fond semi-transparent + \texttt{backdrop-filter: blur()}
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Les fichiers CSS par page}
+
+Chaque page a son propre fichier CSS qui stylise les éléments \textbf{spécifiques} à cette page. Par exemple~:
+\begin{itemize}
+    \item \texttt{dashboard.css}~: timeline des étapes, barre de progression, cartes KPI
+    \item \texttt{cargo.css}~: tableau d'objets, modal, badges de statut (vert, orange, rouge)
+    \item \texttt{iss-tracker.css}~: conteneur de la carte, spinner de chargement
+    \item \texttt{landing.css}~: effet glitch, hero plein écran, grille de features
+\end{itemize}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 12 : LE JAVASCRIPT
+% ══════════════════════════════════════════════════════════════
+\section{Le JavaScript~: l'interactivité}
+
+\subsection{Le fichier global~: \texttt{main.js}}
+
+Chargé sur \textbf{toutes les pages} (via \texttt{footer.php}), il fournit~:
+
+\begin{itemize}
+    \item \textbf{Menu hamburger}~: ouvre/ferme la navbar sur mobile
+    \item \textbf{Smooth scroll}~: scroll fluide pour les liens \texttt{\#ancre}
+    \item \textbf{\texttt{apiFetch()}}~: wrapper autour de \texttt{fetch()} (vu section précédente)
+    \item \textbf{\texttt{showFlash()}}~: affiche un message temporaire (succès/erreur)
+\end{itemize}
+
+\subsection{\texttt{landing.js} --- Les étoiles}
+
+Ce script crée l'animation d'étoiles sur le canvas~:
+\begin{enumerate}
+    \item Crée 200 étoiles aléatoires (position, taille, vitesse)
+    \item Les fait « tomber » lentement avec un scintillement (alpha aléatoire)
+    \item Utilise \texttt{requestAnimationFrame} pour une animation fluide à 60 FPS
+    \item Observe les éléments \texttt{[data-aos]} pour les faire apparaître au scroll
+\end{enumerate}
+
+\textbf{Réutilisé par}~: \texttt{login.php} et \texttt{register.php} (même fond d'étoiles).
+
+\subsection{\texttt{dashboard.js} --- Mission Control}
+
+\begin{itemize}
+    \item \textbf{Bouton « Next Step »}~: appelle l'API \texttt{force\_step} pour avancer d'une étape, puis recharge la page.
+    \item \textbf{Capteurs}~: appelle \texttt{sensor\_live.php} toutes les 5 secondes pour afficher O$_2$, CO$_2$, température, etc.
+    \item \textbf{Historique}~: charge la liste des actions passées via \texttt{history.php}.
+\end{itemize}
+
+\subsection{\texttt{cargo.js} --- Le CRUD cargo}
+
+C'est le fichier JS le plus complexe. Il gère tout le cycle de vie des objets~:
+
+\begin{lstlisting}[language=Java, title={Cycle CRUD dans cargo.js (simplifié)}]
+// 1. Charger tous les objets
+async function loadObjects() {
+    objects = await apiFetch('/php/api/dashboard.php?entity=cargo');
+    renderTable();
+}
+
+// 2. Afficher le tableau
+function renderTable() { /* filtre + genere les <tr> */ }
+
+// 3. Ouvrir le modal pour editer
+window.editObj = function(id) { /* remplit le formulaire */ };
+
+// 4. Sauvegarder (POST pour creer, PUT pour modifier)
+form.addEventListener('submit', async e => { /* ... */ });
+
+// 5. Supprimer (DELETE)
+window.delObj = async function(id) { /* ... */ };
+\end{lstlisting}
+
+\subsection{\texttt{iss-tracker.js} --- La carte ISS}
+
+\begin{enumerate}
+    \item Initialise une carte Leaflet centrée sur (0, 0)
+    \item Place un marqueur avec l'icône de l'ISS
+    \item Toutes les 5 secondes, appelle l'API Open Notify pour la position
+    \item Déplace le marqueur et dessine une traînée (\texttt{L.polyline})
+    \item Charge aussi la liste de l'équipage et le prochain passage
+\end{enumerate}
+
+\subsection{\texttt{journal.js} et \texttt{admin.js}}
+
+\begin{itemize}
+    \item \texttt{journal.js}~: charge les entrées (GET), poste une nouvelle entrée (POST), supprime (DELETE)
+    \item \texttt{admin.js}~: soumet les formulaires « Force Step » et « Unlock Step » via l'API, gère le bouton Reset
+\end{itemize}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 13 : LA BASE DE DONNÉES
+% ══════════════════════════════════════════════════════════════
+\section{La base de données (Le « cerveau » du jeu)}
+
+La base de données s'appelle \textbf{\texttt{escapegame\_G5B}}. Toutes les tables concernant cette salle (Salle de Stockage) commencent par le préfixe \texttt{g5e\_}.
+
+Voici les principales tables et les informations qui y sont stockées :
+
+\begin{conceptbox}{\faDatabase\ Les données clés}
+\begin{description}[leftmargin=4.5cm, style=nextline]
+    \item[\texttt{g5e\_capteur\_logs}] \textbf{Les mesures physiques (Tensions et Distances) :}\\
+    À chaque fois que le capteur infrarouge lit une valeur, le script Arduino/Python vient l'inscrire ici.
+    \begin{itemize}
+        \item \texttt{adc\_value} : La tension brute (valeur entre 0 et 4095) lue par le capteur.
+        \item \texttt{distance\_cm} : La tension convertie en centimètres (souvent entre 10 et 80 cm).
+        \item \texttt{created\_at} : La date et l'heure exactes de la mesure.
+    \end{itemize}
+
+    \item[\texttt{g5e\_enigme\_steps}] \textbf{La logique des énigmes :}\\
+    Définit les actions à réaliser par les joueurs avec les objets physiques.
+    \begin{itemize}
+        \item \texttt{target\_distance\_cm} : La distance cible (ex: 35 cm) pour valider l'étape.
+        \item \texttt{tolerance\_cm} : La marge d'erreur autorisée (ex: $\pm$4 cm).
+        \item \texttt{unlocked} : Indique si l'étape a été réussie (0 = Non, 1 = Oui).
+    \end{itemize}
+
+    \item[\texttt{progression}] \textbf{Table globale (Bonus inter-salles) :}\\
+    Une table partagée avec les autres groupes du projet. Quand ton groupe (\texttt{salle = 'G5E'}) réussit des actions, le pourcentage de \texttt{progress} (de 0 à 100) augmente.
+
+    \item[\texttt{g5e\_game\_sessions}] \textbf{Le chronomètre du Game Master :}\\
+    Enregistre le début (\texttt{started\_at}), la fin (\texttt{ended\_at}) et le statut d'une partie (en cours, réussie, échouée).
+
+    \item[\texttt{g5e\_alerts}] \textbf{Le journal de bord technique :}\\
+    Enregistre les événements du jeu (ex: « Étape validée ») ou les problèmes (ex: « Capteur hors ligne ») pour alerter le Game Master sur le Dashboard.
+\end{description}
+\end{conceptbox}
+
+\begin{tipbox}{\faSync\ Circuit d'une donnée physique (Capteur)}
+\begin{enumerate}[leftmargin=0.8cm]
+    \item L'Arduino lit une tension brute (\texttt{adc\_value}).
+    \item Il la convertit en distance et l'envoie au site web.
+    \item Le site la sauvegarde dans la table \texttt{g5e\_capteur\_logs}.
+    \item L'API vérifie si cette distance correspond à l'objectif dans \texttt{g5e\_enigme\_steps}.
+    \item Si oui, l'étape est validée (\texttt{unlocked = 1}) et la \texttt{progression} augmente !
+\end{enumerate}
+\end{tipbox}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 14 : FLUX UTILISATEUR COMPLET
+% ══════════════════════════════════════════════════════════════
+\section{Flux utilisateur complet}
+
+Voici le parcours type d'un utilisateur~:
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=0.6cm,
+    every node/.style={font=\small},
+    flowstep/.style={draw, rounded corners=8pt, minimum width=4cm, minimum height=0.8cm, align=center, thick},
+    start/.style={flowstep, fill=greenaccent!15, draw=greenaccent!60},
+    action/.style={flowstep, fill=cyanaccent!15, draw=cyanaccent!60},
+    decision/.style={flowstep, diamond, aspect=2.5, fill=purpleaccent!15, draw=purpleaccent!60, inner sep=2pt},
+    arr/.style={-{Stealth[length=2mm]}, thick},
+]
+
+\node[start] (visit) {Visite le site};
+\node[action, below=of visit] (index) {\texttt{index.php}};
+\node[decision, below=of index] (logged) {Connecté ?};
+\node[action, below left=1cm and 1.5cm of logged] (landing) {\texttt{landing.php}};
+\node[action, below right=1cm and 1.5cm of logged] (dash) {\texttt{dashboard.php}};
+\node[action, below=of landing] (login) {\texttt{login.php}};
+\node[action, below=1.5cm of dash] (pages) {Cargo / ISS / Journal};
+
+\draw[arr] (visit) -- (index);
+\draw[arr] (index) -- (logged);
+\draw[arr] (logged) -- node[above left] {Non} (landing);
+\draw[arr] (logged) -- node[above right] {Oui} (dash);
+\draw[arr] (landing) -- (login);
+\draw[arr] (login) -| node[below, near start] {Succès} (dash);
+\draw[arr] (dash) -- (pages);
+
+\end{tikzpicture}
+\end{center}
+
+% ══════════════════════════════════════════════════════════════
+%  SECTION 15 : RÉSUMÉ
+% ══════════════════════════════════════════════════════════════
+\section{Résumé}
+
+\begin{conceptbox}{\faCheckCircle\ Ce qu'il faut retenir}
+\begin{enumerate}
+    \item \textbf{Architecture MVC simplifiée}~: PHP gère la logique (Modèle + Contrôleur), HTML/CSS l'affichage (Vue).
+    \item \textbf{Includes = réutilisation}~: \texttt{header.php}, \texttt{footer.php}, \texttt{auth.php}, \texttt{db.php} évitent la duplication.
+    \item \textbf{Convention de nommage}~: chaque page \texttt{X} a un \texttt{X.css} et un \texttt{X.js}.
+    \item \textbf{API JSON}~: le JavaScript communique avec le serveur via des endpoints qui renvoient du JSON.
+    \item \textbf{Sécurité}~: sessions PHP, hashing des mots de passe, vérification admin côté serveur.
+    \item \textbf{Thème spatial}~: design sombre avec accents cyan/violet, polices futuristes, glassmorphism.
+\end{enumerate}
+\end{conceptbox}
+
+\begin{tipbox}{\faGraduationCap\ Pour aller plus loin}
+\begin{itemize}
+    \item Regarde les \texttt{DevTools} du navigateur (F12) $\to$ onglet \textbf{Network} pour voir les appels API en direct.
+    \item Modifie \texttt{sensor\_live.php} pour envoyer tes propres données de capteurs.
+    \item Ajoute une nouvelle page en suivant le template~: crée le PHP + CSS + JS, et ajoute un lien dans \texttt{header.php}.
+\end{itemize}
+\end{tipbox}
+
+\end{document}

@@ -15,7 +15,7 @@
  */
 
 // --- Config serie ---
-$portName = 'COM3';
+$portName = 'COM4';
 $baudRate = 9600;
 $bits = 8;
 $stopBit = 1;
